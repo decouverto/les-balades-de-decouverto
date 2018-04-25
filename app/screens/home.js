@@ -1,11 +1,12 @@
 import React from 'react';
-import { StatusBar, AsyncStorage } from 'react-native';
+import { StatusBar, AsyncStorage, Alert } from 'react-native';
 import { Container, Header, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, List, ListItem } from 'native-base';
 
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
 
 import fs from 'react-native-fs';
+import DialogProgress from 'react-native-dialog-progress';
 
 
 const rootURL = 'https://decouverto.github.io/walks/';
@@ -46,7 +47,7 @@ export default class HomeScreen extends React.Component {
             }
         });
     }
-    
+
     createDirectory(id, cb) {
         fs.exists(rootDirectory + id).then((exists) => {
             if (exists) return cb();
@@ -55,11 +56,47 @@ export default class HomeScreen extends React.Component {
     }
 
     downloadWalk(id) {
+
         this.createDirectory(id, (err) => {
             fs.downloadFile({
                 fromUrl: rootURL + id + '.zip',
-                toFile: rootDirectory + id + '/tmp.zip'
-            }).promise.then(console.error).catch(console.error)
+                toFile: rootDirectory + id + '/tmp.zip',
+                begin: () => {
+                    DialogProgress.show({
+                        title: 'Téléchargement',
+                        message: 'Veuillez patientez...',
+                        isCancelable: false
+                    });
+                },
+                progress: (result) => {
+                    DialogProgress.show({
+                        title: 'Téléchargement',
+                        message: 'Veuillez patientez... ' + Math.round(result.bytesWritten/result.contentLength*100) +'%',
+                        isCancelable: false
+                    });
+                }
+            }).promise.then((result) => {
+                DialogProgress.hide();
+                let size = Math.floor(result.bytesWritten * 1e-6);
+                Alert.alert(
+                    'Succès',
+                    'Téléchargement et décompression réussite\n'+size+'Mo téléchargés',
+                    [
+                        { text: 'Ok' },
+                    ],
+                    { cancelable: false }
+                );
+            }).catch(() => {
+                DialogProgress.hide();
+                Alert.alert(
+                    'Erreur',
+                    'Échec du téléchargement',
+                    [
+                        { text: 'Ok' },
+                    ],
+                    { cancelable: false }
+                );
+            })
         });
     }
 

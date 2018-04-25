@@ -23,6 +23,7 @@
     "react-native": "0.52.0",
     "react-native-dialog-progress": "^1.0.2",
     "react-native-fs": "^2.9.12",
+    "react-native-zip-archive": "^2.2.3",
     "react-navigation": "^1.5.11"
   }
 }

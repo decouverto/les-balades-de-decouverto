@@ -1,4 +1,6 @@
 rootProject.name = 'lesbaladesdedecouverto'
+include ':react-native-zip-archive'
+project(':react-native-zip-archive').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-zip-archive/android')
 include ':react-native-dialog-progress'
 project(':react-native-dialog-progress').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-dialog-progress/android')
 

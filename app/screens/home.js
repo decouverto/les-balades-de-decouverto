@@ -7,7 +7,7 @@ import material from '../../native-base-theme/variables/material';
 
 import fs from 'react-native-fs';
 import DialogProgress from 'react-native-dialog-progress';
-
+import { unzip } from 'react-native-zip-archive'
 
 const rootURL = 'https://decouverto.github.io/walks/';
 const rootDirectory = fs.ExternalDirectoryPath + '/';
@@ -71,93 +71,119 @@ export default class HomeScreen extends React.Component {
                 progress: (result) => {
                     DialogProgress.show({
                         title: 'Téléchargement',
-                        message: 'Veuillez patientez... ' + Math.round(result.bytesWritten/result.contentLength*100) +'%',
+                        message: 'Veuillez patientez... ' + Math.round(result.bytesWritten / result.contentLength * 100) + '%',
                         isCancelable: false
                     });
                 }
             }).promise.then((result) => {
                 DialogProgress.hide();
                 let size = Math.floor(result.bytesWritten * 1e-6);
-                Alert.alert(
-                    'Succès',
-                    'Téléchargement et décompression réussite\n'+size+'Mo téléchargés',
-                    [
-                        { text: 'Ok' },
-                    ],
-                    { cancelable: false }
-                );
-            }).catch(() => {
-                DialogProgress.hide();
-                Alert.alert(
-                    'Erreur',
-                    'Échec du téléchargement',
-                    [
-                        { text: 'Ok' },
-                    ],
-                    { cancelable: false }
-                );
-            })
-        });
-    }
+                unzip(rootDirectory + id + '/tmp.zip', rootDirectory + id)
+                    .then(() => {
+                        fs.unlink(rootDirectory + id + '/tmp.zip')
+                            .then(() => {
+                                Alert.alert(
+                                    'Succès',
+                                    'Téléchargement et décompression réussite\n' + size + 'Mo téléchargés',
+                                    [
+                                        { text: 'Ok' },
+                                    ],
+                                    { cancelable: false }
+                                );
+                            })
+                            .catch(() => {
+                                Alert.alert(
+                                    'Erreur',
+                                    'Erreur lors de la suppression du fichier temporaire',
+                                    [
+                                        { text: 'Ok' },
+                                    ],
+                                    { cancelable: false }
+                                );
+                            });
+                    })
+                    .catch((error) => {
+                        Alert.alert(
+                            'Erreur',
+                            'Échec de la décompression',
+                            [
+                                { text: 'Ok' },
+                            ],
+                            { cancelable: false }
+                        );
+                    })
+                }).catch(() => {
+                    DialogProgress.hide();
+                    Alert.alert(
+                        'Erreur',
+                        'Échec du téléchargement',
+                        [
+                            { text: 'Ok' },
+                        ],
+                        { cancelable: false }
+                    );
+                })
+            });
+        }
 
     render() {
-        return (
-            <StyleProvider style={getTheme(material)}>
-                <Container>
-                    <Header>
-                        <Left>
-                            <Button
-                                transparent
-                                onPress={() => this.props.navigation.navigate('DrawerOpen')}>
-                                <Icon name='menu' />
-                            </Button>
-                        </Left>
-                        <Body>
-                            <Title>Découverto</Title>
-                        </Body>
-                        <Right />
-                    </Header>
-                    <Content padder>
-                        <H1>Balades</H1>
-                        <List
-                            dataArray={this.state.walks}
-                            renderRow={data => {
-                                return (
-                                    <ListItem>
-                                        <Card>
-                                            <CardItem header>
-                                                <Left>
-                                                    <Body>
-                                                        <H3>{data.title}</H3>
-                                                        <Text note>{(data.distance / 1000).toFixed(1)}km</Text>
-                                                    </Body>
-                                                </Left>
-                                            </CardItem>
-                                            <CardItem>
-                                                <Body>
-                                                    <Text>{data.description}</Text>
-                                                </Body>
-                                            </CardItem>
-                                            <CardItem footer button onPress={() => this.downloadWalk(data.id)}>
-                                                <Text>Télécharger</Text>
-                                            </CardItem>
-                                        </Card>
-                                    </ListItem>
-                                );
-                            }}
-                        />
-                        {(this.state.errLoading) ? (
-                            <Card>
-                                <CardItem style={{ backgroundColor: '#f39c12' }}>
-                                    <Body>
-                                        <Text >Impossible de télécharger la liste des dernières balades, vous êtes certainement hors-ligne.</Text>
-                                    </Body>
-                                </CardItem>
-                            </Card>
-                        ) : null}
-                    </Content>
-                </Container>
+                return(
+            <StyleProvider style = { getTheme(material) } >
+                        <Container>
+                            <Header>
+                                <Left>
+                                    <Button
+                                        transparent
+                                        onPress={() => this.props.navigation.navigate('DrawerOpen')}>
+                                        <Icon name='menu' />
+                                    </Button>
+                                </Left>
+                                <Body>
+                                    <Title>Découverto</Title>
+                                </Body>
+                                <Right />
+                            </Header>
+                            <Content padder>
+                                <H1>Balades</H1>
+                                <List
+                                    dataArray={this.state.walks}
+                                    renderRow={data => {
+                                        return (
+                                            <ListItem>
+                                                <Card>
+                                                    <CardItem header>
+                                                        <Left>
+                                                            <Body>
+                                                                <H3>{data.title}</H3>
+                                                                <Text note>{(data.distance / 1000).toFixed(1)}km</Text>
+                                                            </Body>
+                                                        </Left>
+                                                    </CardItem>
+                                                    <CardItem>
+                                                        <Body>
+                                                            <Text>{data.description}</Text>
+                                                        </Body>
+                                                    </CardItem>
+                                                    <CardItem footer button onPress={() => this.downloadWalk(data.id)}>
+                                                        <Text>Télécharger</Text>
+                                                    </CardItem>
+                                                </Card>
+                                            </ListItem>
+                                        );
+                                    }}
+                                />
+                                {(this.state.errLoading) ? (
+                                    <Card>
+                                        <CardItem style={{ backgroundColor: '#f39c12' }}>
+                                            <Body>
+                                                <Text >Impossible de télécharger la liste des dernières balades, vous êtes certainement hors-ligne.</Text>
+                                            </Body>
+                                        </CardItem>
+                                    </Card>
+                                ) : null}
+                            </Content>
+                        </Container>
             </StyleProvider>
         );
-    }
+            }
 }

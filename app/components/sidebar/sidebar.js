@@ -31,7 +31,7 @@ export default class SideBar extends React.Component {
                                 <ListItem
                                     button
                                     onPress={() => this.props.navigation.navigate(data.way)}>
-                                    <Text><Icon name={data.icon} /> {data.text}</Text>
+                                    <Icon name={data.icon} /><Text> {data.text}</Text>
                                 </ListItem>
                             );
                         }}

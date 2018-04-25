@@ -5,7 +5,11 @@ import { Container, Header, Title, Left, Icon, Right, Button, Body, Content, H1,
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
 
+import fs from 'react-native-fs';
 
+
+const rootURL = 'https://decouverto.github.io/walks/';
+const rootDirectory = fs.ExternalDirectoryPath + '/';
 
 export default class HomeScreen extends React.Component {
 
@@ -20,7 +24,7 @@ export default class HomeScreen extends React.Component {
             if (value !== null && !err) {
                 this.setState({ walks: JSON.parse(value) });
             }
-            fetch('https://decouverto.github.io/walks/index.json')
+            fetch(rootURL + 'index.json')
                 .then((response) => response.json())
                 .then((responseJson) => {
                     this.setState({
@@ -33,13 +37,29 @@ export default class HomeScreen extends React.Component {
                     this.setState({
                         errLoading: true
                     });
-                    
+
                 });
         });
         AsyncStorage.getItem('downloadedWalks', function (value) {
             if (value !== null) {
                 this.setState({ downloadedWalks: JSON.parse(value) });
             }
+        });
+    }
+    
+    createDirectory(id, cb) {
+        fs.exists(rootDirectory + id).then((exists) => {
+            if (exists) return cb();
+            fs.mkdir(rootDirectory + id).then(cb).catch(cb);
+        }).catch(cb)
+    }
+
+    downloadWalk(id) {
+        this.createDirectory(id, (err) => {
+            fs.downloadFile({
+                fromUrl: rootURL + id + '.zip',
+                toFile: rootDirectory + id + '/tmp.zip'
+            }).promise.then(console.error).catch(console.error)
         });
     }
 
@@ -81,7 +101,7 @@ export default class HomeScreen extends React.Component {
                                                     <Text>{data.description}</Text>
                                                 </Body>
                                             </CardItem>
-                                            <CardItem footer button onPress={() => alert('Téléchargement en cours...')}>
+                                            <CardItem footer button onPress={() => this.downloadWalk(data.id)}>
                                                 <Text>Télécharger</Text>
                                             </CardItem>
                                         </Card>
@@ -91,7 +111,7 @@ export default class HomeScreen extends React.Component {
                         />
                         {(this.state.errLoading) ? (
                             <Card>
-                                <CardItem style={{ backgroundColor: '#f39c12'}}>
+                                <CardItem style={{ backgroundColor: '#f39c12' }}>
                                     <Body>
                                         <Text >Impossible de télécharger la liste des dernières balades, vous êtes certainement hors-ligne.</Text>
                                     </Body>

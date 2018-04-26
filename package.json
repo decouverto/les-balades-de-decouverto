@@ -12,7 +12,8 @@
     "start": "react-native start",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "test": "jest"
+    "test": "jest",
+    "log": "react-native log-android"
   },
   "jest": {
     "preset": "react-native"

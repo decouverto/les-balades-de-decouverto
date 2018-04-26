@@ -20,7 +20,6 @@ export default class HomeScreen extends React.Component {
     }
 
     componentDidMount() {
-
         AsyncStorage.getItem('walks', (err, value) => {
             if (value !== null && !err) {
                 this.setState({ walks: JSON.parse(value) });
@@ -32,19 +31,19 @@ export default class HomeScreen extends React.Component {
                         errLoading: false,
                         walks: responseJson
                     });
-                    AsyncStorage.setItem('walks', JSON.stringify(responseJson));
+                    AsyncStorage.setItem('walks', JSON.stringify(responseJson));     
                 })
-                .catch((error) => {
+                .catch(() => {
                     this.setState({
                         errLoading: true
                     });
-
                 });
         });
-        AsyncStorage.getItem('downloadedWalks', function (value) {
-            if (value !== null) {
+        AsyncStorage.getItem('downloadedWalks', (err, value) => {
+            if (value !== null && !err) {
                 this.setState({ downloadedWalks: JSON.parse(value) });
             }
+            
         });
     }
 
@@ -56,7 +55,6 @@ export default class HomeScreen extends React.Component {
     }
 
     downloadWalk(id) {
-
         this.createDirectory(id, (err) => {
             fs.downloadFile({
                 fromUrl: rootURL + id + '.zip',
@@ -82,6 +80,10 @@ export default class HomeScreen extends React.Component {
                     .then(() => {
                         fs.unlink(rootDirectory + id + '/tmp.zip')
                             .then(() => {
+                                let list = this.state.downloadedWalks;
+                                list.push(id);
+                                this.setState({ downloadedWalks: list });
+                                AsyncStorage.setItem('downloadedWalks', JSON.stringify(list));
                                 Alert.alert(
                                     'Succès',
                                     'Téléchargement et décompression réussite\n' + size + 'Mo téléchargés',
@@ -102,7 +104,7 @@ export default class HomeScreen extends React.Component {
                                 );
                             });
                     })
-                    .catch((error) => {
+                    .catch(() => {
                         Alert.alert(
                             'Erreur',
                             'Échec de la décompression',
@@ -112,78 +114,97 @@ export default class HomeScreen extends React.Component {
                             { cancelable: false }
                         );
                     })
-                }).catch(() => {
-                    DialogProgress.hide();
-                    Alert.alert(
-                        'Erreur',
-                        'Échec du téléchargement',
-                        [
-                            { text: 'Ok' },
-                        ],
-                        { cancelable: false }
-                    );
-                })
-            });
+            }).catch(() => {
+                DialogProgress.hide();
+                Alert.alert(
+                    'Erreur',
+                    'Échec du téléchargement',
+                    [
+                        { text: 'Ok' },
+                    ],
+                    { cancelable: false }
+                );
+            })
+        });
+    }
+
+    isDownloaded(id) {
+        for (let k in this.state.downloadedWalks) {
+            if (this.state.downloadedWalks[k] == id) {
+                return true;
+            }
         }
+        return false;
+    }
+
+    openWalk(data) {
+
+    }
 
     render() {
-                return(
-            <StyleProvider style = { getTheme(material) } >
-                        <Container>
-                            <Header>
-                                <Left>
-                                    <Button
-                                        transparent
-                                        onPress={() => this.props.navigation.navigate('DrawerOpen')}>
-                                        <Icon name='menu' />
-                                    </Button>
-                                </Left>
-                                <Body>
-                                    <Title>Découverto</Title>
-                                </Body>
-                                <Right />
-                            </Header>
-                            <Content padder>
-                                <H1>Balades</H1>
-                                <List
-                                    dataArray={this.state.walks}
-                                    renderRow={data => {
-                                        return (
-                                            <ListItem>
-                                                <Card>
-                                                    <CardItem header>
-                                                        <Left>
-                                                            <Body>
-                                                                <H3>{data.title}</H3>
-                                                                <Text note>{(data.distance / 1000).toFixed(1)}km</Text>
-                                                            </Body>
-                                                        </Left>
-                                                    </CardItem>
-                                                    <CardItem>
-                                                        <Body>
-                                                            <Text>{data.description}</Text>
-                                                        </Body>
-                                                    </CardItem>
-                                                    <CardItem footer button onPress={() => this.downloadWalk(data.id)}>
-                                                        <Text>Télécharger</Text>
-                                                    </CardItem>
-                                                </Card>
-                                            </ListItem>
-                                        );
-                                    }}
-                                />
-                                {(this.state.errLoading) ? (
-                                    <Card>
-                                        <CardItem style={{ backgroundColor: '#f39c12' }}>
-                                            <Body>
-                                                <Text >Impossible de télécharger la liste des dernières balades, vous êtes certainement hors-ligne.</Text>
-                                            </Body>
-                                        </CardItem>
-                                    </Card>
-                                ) : null}
-                            </Content>
-                        </Container>
+        return (
+            <StyleProvider style={getTheme(material)} >
+                <Container>
+                    <Header>
+                        <Left>
+                            <Button
+                                transparent
+                                onPress={() => this.props.navigation.navigate('DrawerOpen')}>
+                                <Icon name='menu' />
+                            </Button>
+                        </Left>
+                        <Body>
+                            <Title>Découverto</Title>
+                        </Body>
+                        <Right />
+                    </Header>
+                    <Content padder>
+                        <H1>Balades</H1>
+                        <List
+                            dataArray={this.state.walks}
+                            renderRow={data => {
+                                return (
+                                    <ListItem>
+                                        <Card>
+                                            <CardItem header>
+                                                <Left>
+                                                    <Body>
+                                                        <H3>{data.title}</H3>
+                                                        <Text note>{(data.distance / 1000).toFixed(1)}km</Text>
+                                                    </Body>
+                                                </Left>
+                                            </CardItem>
+                                            <CardItem>
+                                                <Body>
+                                                    <Text>{data.description}</Text>
+                                                </Body>
+                                            </CardItem>
+                                            {(this.isDownloaded(data.id)) ? (
+                                                <CardItem footer button onPress={() => this.openWalk(data)}>
+                                                    <Text>Ouvrir</Text>
+                                                </CardItem>
+                                            ) : (
+                                                <CardItem footer button onPress={() => this.downloadWalk(data.id)}>
+                                                    <Text>Télécharger</Text>
+                                                </CardItem>
+                                            )}
+                                        </Card>
+                                    </ListItem>
+                                );
+                            }}
+                        />
+                        {(this.state.errLoading) ? (
+                            <Card>
+                                <CardItem style={{ backgroundColor: '#f39c12' }}>
+                                    <Body>
+                                        <Text >Impossible de télécharger la liste des dernières balades, vous êtes certainement hors-ligne.</Text>
+                                    </Body>
+                                </CardItem>
+                            </Card>
+                        ) : null}
+                    </Content>
+                </Container>
             </StyleProvider>
         );
-            }
+    }
 }

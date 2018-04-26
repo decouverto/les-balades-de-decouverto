@@ -122,8 +122,8 @@ export default {
   footerPaddingBottom: isIphoneX ? 34 : 0,
 
   // FooterTab
-  tabBarTextColor: "#bfc6ea",
-  tabBarTextSize: 11,
+  tabBarTextColor: "#fff",
+  tabBarTextSize: 16,
   activeTab: "#fff",
   sTabBarActiveTextColor: "#007aff",
   tabBarActiveTextColor: "#fff",

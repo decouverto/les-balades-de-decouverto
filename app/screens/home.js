@@ -16,7 +16,7 @@ export default class HomeScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { errLoading: true, walks: [], downloadedWalks: [] }
+        this.state = { errLoading: false, walks: [], downloadedWalks: [] }
     }
 
     componentDidMount() {
@@ -138,7 +138,19 @@ export default class HomeScreen extends React.Component {
     }
 
     openWalk(data) {
-
+        fs.readFile(rootDirectory + data.id + '/index.json').then((response) => {
+            this.props.navigation.navigate('AboutWalk', {...data, ...JSON.parse(response)});
+        }).catch((e)=>{
+            console.log(e)
+            Alert.alert(
+                'Erreur',
+                'Impossible de lire le parcours',
+                [
+                    { text: 'Ok' },
+                ],
+                { cancelable: false }
+            );
+        })
     }
 
     render() {

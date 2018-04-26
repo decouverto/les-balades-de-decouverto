@@ -42,8 +42,7 @@ export default class HomeScreen extends React.Component {
         AsyncStorage.getItem('downloadedWalks', (err, value) => {
             if (value !== null && !err) {
                 this.setState({ downloadedWalks: JSON.parse(value) });
-            }
-            
+            } 
         });
     }
 
@@ -140,8 +139,7 @@ export default class HomeScreen extends React.Component {
     openWalk(data) {
         fs.readFile(rootDirectory + data.id + '/index.json').then((response) => {
             this.props.navigation.navigate('AboutWalk', {...data, ...JSON.parse(response)});
-        }).catch((e)=>{
-            console.log(e)
+        }).catch(()=>{
             Alert.alert(
                 'Erreur',
                 'Impossible de lire le parcours',

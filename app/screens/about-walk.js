@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatusBar, Alert, Linking } from 'react-native';
+import { StatusBar, Alert, Linking, AsyncStorage } from 'react-native';
 import { Container, Header, Title, Left, Icon, Right, Body, Content, H1, H3, Text, StyleProvider, List, ListItem, Footer, FooterTab, Button } from 'native-base';
 
 import getTheme from '../../native-base-theme/components';
@@ -25,6 +25,50 @@ export default class AboutWalkScreen extends React.Component {
         });
     };
 
+    removeWalk(id) {
+        Alert.alert(
+            'Attention',
+            'Êtes-vous sûr de vouloir supprimer la promenade de votre téléphone ?',
+            [
+                { text: 'Annuler' },
+                {
+                    text: 'OK', onPress: () => {
+                        fs.unlink(rootDirectory + id)
+                            .then(() => {
+                                AsyncStorage.getItem('downloadedWalks', (err, value) => {
+                                    if (value !== null && !err) {
+                                        let list = JSON.parse(value);
+                                        list.splice(list.splice(id, 1), 1);
+                                        AsyncStorage.setItem('downloadedWalks', JSON.stringify(list));
+                                        this.props.navigation.navigate('Home');
+                                        Alert.alert(
+                                            'Succès',
+                                            'Les fichiers ont bien été supprimées.',
+                                            [
+                                                { text: 'Ok' },
+                                            ],
+                                            { cancelable: false }
+                                        );
+                                    }
+                                });
+                            })
+                            .catch(() => {
+                                Alert.alert(
+                                    'Erreur',
+                                    'Impossible de supprimer les fichiers du téléphone.',
+                                    [
+                                        { text: 'Ok' },
+                                    ],
+                                    { cancelable: false }
+                                );
+                            });
+                    }
+                },
+            ],
+            { cancelable: false }
+        )
+    }
+
     render() {
         return (
             <StyleProvider style={getTheme(material)} >
@@ -40,7 +84,13 @@ export default class AboutWalkScreen extends React.Component {
                         <Body>
                             <Title>Avertissements</Title>
                         </Body>
-                        <Right />
+                        <Right>
+                            <Button
+                                transparent
+                                onPress={() => this.removeWalk(this.state.id)}>
+                                <Icon name='ios-trash' />
+                            </Button>
+                        </Right>
                     </Header>
                     <Content padder>
                         <H1>{this.state.title}</H1>

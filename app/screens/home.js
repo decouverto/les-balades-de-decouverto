@@ -53,11 +53,11 @@ export default class HomeScreen extends React.Component {
         }).catch(cb)
     }
 
-    downloadWalk(id) {
-        this.createDirectory(id, (err) => {
+    downloadWalk(data) {
+        this.createDirectory(data.id, (err) => {
             fs.downloadFile({
-                fromUrl: rootURL + id + '.zip',
-                toFile: rootDirectory + id + '/tmp.zip',
+                fromUrl: rootURL + data.id + '.zip',
+                toFile: rootDirectory + data.id + '/tmp.zip',
                 begin: () => {
                     DialogProgress.show({
                         title: 'Téléchargement',
@@ -75,14 +75,14 @@ export default class HomeScreen extends React.Component {
             }).promise.then((result) => {
                 DialogProgress.hide();
                 let size = Math.floor(result.bytesWritten * 1e-6);
-                unzip(rootDirectory + id + '/tmp.zip', rootDirectory + id)
+                unzip(rootDirectory + data.id + '/tmp.zip', rootDirectory + data.id)
                     .then(() => {
-                        fs.unlink(rootDirectory + id + '/tmp.zip')
+                        fs.unlink(rootDirectory + data.id + '/tmp.zip')
                             .then(() => {
                                 let list = this.state.downloadedWalks;
-                                list.push(id);
-                                this.setState({ downloadedWalks: list });
+                                list.push(data.id);
                                 AsyncStorage.setItem('downloadedWalks', JSON.stringify(list));
+                                this.openWalk(data);
                                 Alert.alert(
                                     'Succès',
                                     'Téléchargement et décompression réussite\n' + size + 'Mo téléchargés',
@@ -92,7 +92,8 @@ export default class HomeScreen extends React.Component {
                                     { cancelable: false }
                                 );
                             })
-                            .catch(() => {
+                            .catch((e) => {
+                                console.log(e)
                                 Alert.alert(
                                     'Erreur',
                                     'Erreur lors de la suppression du fichier temporaire',
@@ -194,7 +195,7 @@ export default class HomeScreen extends React.Component {
                                                     <Text>Ouvrir</Text>
                                                 </CardItem>
                                             ) : (
-                                                <CardItem footer button onPress={() => this.downloadWalk(data.id)}>
+                                                <CardItem footer button onPress={() => this.downloadWalk(data)}>
                                                     <Text>Télécharger</Text>
                                                 </CardItem>
                                             )}

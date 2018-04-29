@@ -138,6 +138,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-splash-screen')
     compile project(':react-native-zip-archive')
     compile project(':react-native-dialog-progress')
     compile fileTree(dir: "libs", include: ["*.jar"])

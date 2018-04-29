@@ -7,7 +7,9 @@ import material from '../../native-base-theme/variables/material';
 
 import fs from 'react-native-fs';
 import DialogProgress from 'react-native-dialog-progress';
-import { unzip } from 'react-native-zip-archive'
+import { unzip } from 'react-native-zip-archive';
+
+import SplashScreen from 'react-native-splash-screen';
 
 const rootURL = 'https://decouverto.github.io/walks/';
 const rootDirectory = fs.ExternalDirectoryPath + '/';
@@ -31,18 +33,19 @@ export default class HomeScreen extends React.Component {
                         errLoading: false,
                         walks: responseJson
                     });
-                    AsyncStorage.setItem('walks', JSON.stringify(responseJson));     
+                    AsyncStorage.setItem('walks', JSON.stringify(responseJson));
                 })
                 .catch(() => {
                     this.setState({
                         errLoading: true
                     });
                 });
+            SplashScreen.hide();
         });
         AsyncStorage.getItem('downloadedWalks', (err, value) => {
             if (value !== null && !err) {
                 this.setState({ downloadedWalks: JSON.parse(value) });
-            } 
+            }
         });
     }
 
@@ -139,8 +142,8 @@ export default class HomeScreen extends React.Component {
 
     openWalk(data) {
         fs.readFile(rootDirectory + data.id + '/index.json').then((response) => {
-            this.props.navigation.navigate('AboutWalk', {...data, ...JSON.parse(response)});
-        }).catch(()=>{
+            this.props.navigation.navigate('AboutWalk', { ...data, ...JSON.parse(response) });
+        }).catch(() => {
             Alert.alert(
                 'Erreur',
                 'Impossible de lire le parcours',
@@ -195,10 +198,10 @@ export default class HomeScreen extends React.Component {
                                                     <Text>Ouvrir</Text>
                                                 </CardItem>
                                             ) : (
-                                                <CardItem footer button onPress={() => this.downloadWalk(data)}>
-                                                    <Text>Télécharger</Text>
-                                                </CardItem>
-                                            )}
+                                                    <CardItem footer button onPress={() => this.downloadWalk(data)}>
+                                                        <Text>Télécharger</Text>
+                                                    </CardItem>
+                                                )}
                                         </Card>
                                     </ListItem>
                                 );

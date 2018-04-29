@@ -22,6 +22,7 @@ export default class HomeScreen extends React.Component {
     }
 
     componentDidMount() {
+        this._mounted = true;
         AsyncStorage.multiGet(['walks', 'downloadedWalks'], (err, values) => {
             if (values !== null && !err) {
                 var obj = {};
@@ -33,10 +34,12 @@ export default class HomeScreen extends React.Component {
             fetch(rootURL + 'index.json')
                 .then((response) => response.json())
                 .then((responseJson) => {
-                    this.setState({
-                        errLoading: false,
-                        walks: responseJson
-                    });
+                    if (this._mounted) {
+                        this.setState({
+                            errLoading: false,
+                            walks: responseJson
+                        });
+                    }
                     AsyncStorage.setItem('walks', JSON.stringify(responseJson));
                 })
                 .catch(() => {
@@ -46,6 +49,10 @@ export default class HomeScreen extends React.Component {
                 });
             SplashScreen.hide();
         });
+    }
+
+    componentWillUnmount() {
+        this._mounted = false;
     }
 
     createDirectory(id, cb) {

@@ -105,7 +105,7 @@ export default class AboutWalkScreen extends React.Component {
                     </Content>
                     <Footer>
                         <FooterTab>
-                            <Button full onPress={() => this.props.navigation.navigate('Map')}>
+                            <Button full onPress={() => this.props.navigation.navigate('Map', this.state)}>
                                 <Text>Démarrer la promenade</Text>
                             </Button>
                         </FooterTab>

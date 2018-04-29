@@ -85,7 +85,7 @@ export default class HomeScreen extends React.Component {
                                 this.openWalk(data);
                                 Alert.alert(
                                     'Succès',
-                                    'Téléchargement et décompression réussite\n' + size + 'Mo téléchargés',
+                                    'Téléchargement et décompression réussite\n' + size + ' Mo téléchargés',
                                     [
                                         { text: 'Ok' },
                                     ],
@@ -208,7 +208,7 @@ export default class HomeScreen extends React.Component {
                             <Card>
                                 <CardItem style={{ backgroundColor: '#f39c12' }}>
                                     <Body>
-                                        <Text >Impossible de télécharger la liste des dernières balades, vous êtes certainement hors-ligne.</Text>
+                                        <Text>Impossible de télécharger la liste des dernières balades, vous êtes certainement hors-ligne.</Text>
                                     </Body>
                                 </CardItem>
                             </Card>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar, Alert, Linking, AsyncStorage } from 'react-native';
-import { Container, Header, Title, Left, Icon, Right, Body, Content, H1, H3, Text, StyleProvider, List, ListItem, Footer, FooterTab, Button } from 'native-base';
+import { Container, Header, Title, Left, Icon, Right, Body, Content, H1, Text, StyleProvider, Footer, FooterTab, Button } from 'native-base';
 
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
@@ -100,11 +100,12 @@ export default class AboutWalkScreen extends React.Component {
                         </Button>
                         <Text>La distance du parcours est de <Text style={{ fontWeight: 'bold' }}>{(this.state.distance / 1000).toFixed(1)}km</Text>.{'\n'}</Text>
                         <Text>La marche est considérée comme un sport par conséquent assurez-vous d'avoir les conditions physiques nécessaires pour pouvoir la pratiquer.{'\n'}</Text>
-                        <Text>Nous vous rappelons que cette application pour smartphone peut à tout moment être victime d'une panne ou d'une déficience technique. Vous ne devez par conséquent pas avoir une foi aveugle en elle et nous vous conseillons de toujours vous munir d'une carte lorsque vous allez en forêt.{'\n'}</Text>
+                        <Text>L'association Découverto, ses auteurs et ses collaborateurs déclinent toutes responsabilités quant à l'utilisation, l'exactitude et la manipulation de l'application.{'\n'}</Text>
+                        <Text>Nous vous rappelons que cette application pour smartphone peut à tout moment être victime d'une panne ou d'une déficience technique. Vous ne devez par conséquent pas avoir une foi aveugle en elle et nous vous conseillons de toujours vous munir d'une carte lorsque vous allez en forêt.</Text>
                     </Content>
                     <Footer>
                         <FooterTab>
-                            <Button full>
+                            <Button full onPress={() => this.props.navigation.navigate('Map')}>
                                 <Text>Démarrer la promenade</Text>
                             </Button>
                         </FooterTab>

@@ -9,6 +9,11 @@ import fs from 'react-native-fs';
 
 const rootDirectory = fs.ExternalDirectoryPath + '/';
 
+import MapView, { Polyline, Marker } from 'react-native-maps';
+import BackgroundGeolocation from 'react-native-mauron85-background-geolocation';
+import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
+import KeepAwake from 'react-native-keep-awake';
+
 export default class MapScreen extends React.Component {
 
     constructor(props) {
@@ -18,7 +23,7 @@ export default class MapScreen extends React.Component {
 
     render() {
         return (
-            <StyleProvider style={getTheme(material)} >
+            <StyleProvider style={getTheme(material)}>
                 <Container>
                     <Header>
                         <Left>
@@ -34,8 +39,9 @@ export default class MapScreen extends React.Component {
                         <Right />
                     </Header>
                     <Content padder>
-                    
+
                     </Content>
+                    <KeepAwake />
                 </Container>
             </StyleProvider>
         );

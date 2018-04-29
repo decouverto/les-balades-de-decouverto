@@ -3,9 +3,13 @@ package com.lesbaladesdedecouverto;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.showlocationservicesdialogbox.LocationServicesDialogBoxPackage;
+import com.corbt.keepawake.KCKeepAwakePackage;
+import com.marianhello.bgloc.react.BackgroundGeolocationPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.rnziparchive.RNZipArchivePackage;
 import com.dialogprogress.DialogProgressPackage;
+import com.airbnb.android.react.maps.MapsPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -28,9 +32,13 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new SplashScreenReactPackage(),
-            new RNZipArchivePackage(),
-            new DialogProgressPackage(),
+          new LocationServicesDialogBoxPackage(),
+          new KCKeepAwakePackage(),
+          new BackgroundGeolocationPackage(),
+          new SplashScreenReactPackage(),
+          new RNZipArchivePackage(),
+          new DialogProgressPackage(),
+          new MapsPackage(),
           new RNFSPackage()
       );
     }

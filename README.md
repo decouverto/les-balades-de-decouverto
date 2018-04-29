@@ -30,6 +30,8 @@ Before compaling you will have to get a [Google Maps API key](https://developers
 </resources>
 ```
 
+To make sure that you don't commit the key please execute: `git update-index --assume-unchanged android/app/src/main/res/values/string.xml`
+
 ## Available Scripts
 
 If Yarn was installed when the project was initialized, then dependencies will have been installed via Yarn, and you should probably use it to run these commands as well. Unlike dependency installation, command running syntax is identical for Yarn and NPM at the time of this writing.

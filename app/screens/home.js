@@ -22,9 +22,13 @@ export default class HomeScreen extends React.Component {
     }
 
     componentDidMount() {
-        AsyncStorage.getItem('walks', (err, value) => {
-            if (value !== null && !err) {
-                this.setState({ walks: JSON.parse(value) });
+        AsyncStorage.multiGet(['walks', 'downloadedWalks'], (err, values) => {
+            if (values !== null && !err) {
+                var obj = {};
+                for (var i in values) {
+                    obj[values[i][0]]=JSON.parse(values[i][1]);
+                }
+                this.setState(obj);
             }
             fetch(rootURL + 'index.json')
                 .then((response) => response.json())
@@ -41,11 +45,6 @@ export default class HomeScreen extends React.Component {
                     });
                 });
             SplashScreen.hide();
-        });
-        AsyncStorage.getItem('downloadedWalks', (err, value) => {
-            if (value !== null && !err) {
-                this.setState({ downloadedWalks: JSON.parse(value) });
-            }
         });
     }
 

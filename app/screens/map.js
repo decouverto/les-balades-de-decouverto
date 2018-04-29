@@ -58,7 +58,7 @@ export default class MapScreen extends React.Component {
 
     componentWillUnmount() {
         BackgroundGeolocation.stop();
-      }
+    }
 
     centerMap() {
         this.refs.mapElement.fitToCoordinates(
@@ -116,7 +116,7 @@ export default class MapScreen extends React.Component {
         return (
             <StyleProvider style={getTheme(material)}>
                 <Container style={styles.main_container}>
-                    <Header>
+                    <Header style={{zIndex:5}}>
                         <Left>
                             <Button
                                 transparent
@@ -129,45 +129,45 @@ export default class MapScreen extends React.Component {
                         </Body>
                         <Right />
                     </Header>
-                        <MapView
-                            initialRegion={{
-                                latitude: this.state.points[0].coords.latitude,
-                                longitude: this.state.points[0].coords.longitude,
-                                latitudeDelta: 0.02,
-                                longitudeDelta: 0.02,
-                            }}
-                            style={styles.map}
-                            showsCompass={true}
-                            minZoomLevel={14}
-                            showsMyLocationButton={true}
-                            showsUserLocation={true}
-                            mapType={'terrain'}
-                            loadingEnabled={true}
-                            ref='mapElement'>
-                            <Polyline
-                                coordinates={this.state.itinerary}
-                                strokeColor='#000'
-                                strokeWidth={3}
+                    <MapView
+                        initialRegion={{
+                            latitude: this.state.points[0].coords.latitude,
+                            longitude: this.state.points[0].coords.longitude,
+                            latitudeDelta: 0.02,
+                            longitudeDelta: 0.02,
+                        }}
+                        style={styles.map}
+                        showsCompass={true}
+                        minZoomLevel={14}
+                        showsMyLocationButton={true}
+                        showsUserLocation={true}
+                        mapType={'terrain'}
+                        loadingEnabled={true}
+                        ref='mapElement'>
+                        <Polyline
+                            coordinates={this.state.itinerary}
+                            strokeColor='#000'
+                            strokeWidth={3}
+                        />
+                        {this.state.points.map(marker => (
+                            <Marker
+                                onCalloutPress={() => this.props.navigation.navigate('AboutMarker', marker)}
+                                coordinate={marker.coords}
+                                title={marker.title}
+                                ref={marker.title}
+                                key={marker.title}
                             />
-                            {this.state.points.map(marker => (
-                                <Marker
-                                    onCalloutPress={() => this.props.navigation.navigate('AboutMarker', marker)}
-                                    coordinate={marker.coords}
-                                    title={marker.title}
-                                    ref={marker.title}
-                                    key={marker.title}
-                                />
-                            ))}
-                        </MapView>
-                        <Button style={styles.button_next} onPress={() => this.nextMarker()}>
-                            <Icon name='ios-arrow-forward-outline' />
-                        </Button>
-                        <Button style={styles.button_prev} onPress={() => this.prevMarker()}>
-                            <Icon name='ios-arrow-back' />
-                        </Button>
-                        <Button style={styles.button_map} onPress={() => this.centerMap()}>
-                            <Text style={{ color: '#fff' }}>Recentrer</Text>
-                        </Button>
+                        ))}
+                    </MapView>
+                    <Button style={styles.button_next} onPress={() => this.nextMarker()}>
+                        <Icon name='ios-arrow-forward-outline' />
+                    </Button>
+                    <Button style={styles.button_prev} onPress={() => this.prevMarker()}>
+                        <Icon name='ios-arrow-back' />
+                    </Button>
+                    <Button style={styles.button_map} onPress={() => this.centerMap()}>
+                        <Text style={{ color: '#fff' }}>Recentrer</Text>
+                    </Button>
                     <KeepAwake />
                 </Container>
             </StyleProvider>
@@ -185,15 +185,6 @@ const styles = StyleSheet.create({
         height: '100%',
         width: '100%',
         alignItems: 'stretch',
-    },
-    container: {
-        height: '100%',
-        width: '100%',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
     },
     map: {
         position: 'absolute',

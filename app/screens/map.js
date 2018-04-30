@@ -141,7 +141,7 @@ export default class MapScreen extends React.Component {
                         />
                         {this.state.points.map(marker => (
                             <Marker
-                                onCalloutPress={() => this.props.navigation.navigate('AboutMarker', marker)}
+                                onCalloutPress={() => this.props.navigation.navigate('AboutMarker', {...marker, walk: this.state})}
                                 coordinate={marker.coords}
                                 title={marker.title}
                                 ref={marker.title}

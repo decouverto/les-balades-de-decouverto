@@ -61,17 +61,7 @@ export default class MapScreen extends React.Component {
     }
 
     centerMap() {
-        this.refs.mapElement.fitToCoordinates(
-            [
-                {
-                    latitude: 48.746399,
-                    longitude: 7.251178
-                },
-                {
-                    latitude: 48.734144,
-                    longitude: 7.28212
-                }
-            ], {
+        this.refs.mapElement.fitToCoordinates(this.state.borders, {
                 edgePadding: { top: 10, right: 10, bottom: 10, left: 10 },
                 animated: true,
             }
@@ -116,7 +106,7 @@ export default class MapScreen extends React.Component {
         return (
             <StyleProvider style={getTheme(material)}>
                 <Container style={styles.main_container}>
-                    <Header style={{zIndex:5}}>
+                    <Header style={{ zIndex: 5 }}>
                         <Left>
                             <Button
                                 transparent

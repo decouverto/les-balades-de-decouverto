@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Image, AppState, StatusBar, Dimensions } from 'react-native';
+import { AppState, StatusBar, Dimensions } from 'react-native';
 
 import { StyleProvider, Header, Container, Content, Card, CardItem, Text, Title, Body, Button, H1, Grid, Row, Icon, Alert, Left, Right } from 'native-base';
 
@@ -43,11 +43,10 @@ export default class AboutMarker extends Component {
         const listImages = (this.state.images || []).map(image => {
             var { width } = Dimensions.get('window');
             var height = (width * image.height) / image.width;
-            console.log(rootDirectory + this.state.walk.id + '/images/' + image.path)
             return (<Card key={makeid()}>
                 <CardItem>
                     <Body>
-                        <Image source={{uri: rootDirectory + this.state.walkId + '/images/' + image.path }} initHeight={height} initWidth={width} style={{width, height}} />
+                        <ResponsiveImage source={{isStatic:true, uri: 'file://' + rootDirectory + this.state.walk.id + '/images/' + image.path }} initHeight={height} initWidth={width} />
                     </Body>
                 </CardItem>
             </Card>)

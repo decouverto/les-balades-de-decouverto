@@ -1,6 +1,8 @@
 import React from 'react';
-import { StatusBar, Alert, Linking, AsyncStorage, Dimensions, StyleSheet } from 'react-native';
+import { StatusBar, Alert, Linking, AsyncStorage, Dimensions, StyleSheet, View } from 'react-native';
 import { Container, Header, Title, Left, Icon, Right, Body, Content, Text, StyleProvider, Button } from 'native-base';
+
+import { observer } from 'mobx-react';
 
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
@@ -15,12 +17,18 @@ import LocationServicesDialogBox from 'react-native-android-location-services-di
 import KeepAwake from 'react-native-keep-awake';
 
 import TrackPlayer from 'react-native-track-player';
+import PlayerStore from '../stores/player';
 
+
+@observer
 export default class MapScreen extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = this.props.navigation.state.params;
+        this.centerMap = this.centerMap.bind(this);
+        this.nextMarker = this.nextMarker.bind(this);
+        this.prevMarker = this.prevMarker.bind(this);
     }
 
     componentWillMount() {
@@ -170,6 +178,16 @@ export default class MapScreen extends React.Component {
                     <Button style={styles.button_map} onPress={this.centerMap}>
                         <Text style={{ color: '#fff' }}>Recentrer</Text>
                     </Button>
+                        {(PlayerStore.playbackState === TrackPlayer.STATE_PLAYING || PlayerStore.playbackState === TrackPlayer.STATE_BUFFERING) ? (
+                        <Button onPress={() => TrackPlayer.pause()} style={styles.button_audio}>
+                            <Icon name='pause' />
+                        </Button>
+                        ) : null} 
+                        {(PlayerStore.playbackState === TrackPlayer.STATE_PAUSED) ? (
+                            <Button onPress={() => TrackPlayer.play()} style={styles.button_audio}>
+                            <Icon name='play' />
+                            </Button>
+                        ): null}
                     <KeepAwake />
                 </Container>
             </StyleProvider>
@@ -199,6 +217,16 @@ const styles = StyleSheet.create({
     button_map: {
         position: 'absolute',
         left: 10,
+        bottom: 10,
+        marginRight: 0,
+        marginLeft: 0,
+        paddingLeft: 10,
+        paddingRight: 10,
+        flex: 1
+    },
+    button_audio: {
+        position: 'absolute',
+        right: 10,
         bottom: 10,
         marginRight: 0,
         marginLeft: 0,

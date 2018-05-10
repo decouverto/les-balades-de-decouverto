@@ -3,6 +3,7 @@ package com.lesbaladesdedecouverto;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import guichaguri.trackplayer.TrackPlayer;
 import com.showlocationservicesdialogbox.LocationServicesDialogBoxPackage;
 import com.corbt.keepawake.KCKeepAwakePackage;
 import com.marianhello.bgloc.react.BackgroundGeolocationPackage;
@@ -32,6 +33,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new TrackPlayer(),
           new LocationServicesDialogBoxPackage(),
           new KCKeepAwakePackage(),
           new BackgroundGeolocationPackage(),

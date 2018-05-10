@@ -14,6 +14,8 @@ import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import KeepAwake from 'react-native-keep-awake';
 
+import TrackPlayer from 'react-native-track-player';
+
 export default class MapScreen extends React.Component {
 
     constructor(props) {
@@ -51,9 +53,29 @@ export default class MapScreen extends React.Component {
                 }
             });
             BackgroundGeolocation.start();
+            TrackPlayer.setupPlayer().then(function () {
+                TrackPlayer.updateOptions({
+                    stopWithApp: true,
+                    capabilities: [
+                        TrackPlayer.CAPABILITY_PLAY,
+                        TrackPlayer.CAPABILITY_PAUSE,
+                    ]
+                });
+            });
+            var track = [];
+            this.state.points.forEach((val) => {
+                track.push({
+                    id: val.sound,
+                    url: 'file://' + rootDirectory + this.state.id + '/sounds/' + val.sound, 
+                    title: val.title,
+                    album: this.state.title
+                })
+            })
+            TrackPlayer.add(track);
         }).catch((error) => {
             this.props.navigation.navigate('AboutWalk', this.state);
         });
+
     }
 
     componentWillUnmount() {
@@ -62,9 +84,9 @@ export default class MapScreen extends React.Component {
 
     centerMap() {
         this.refs.mapElement.fitToCoordinates(this.state.borders, {
-                edgePadding: { top: 10, right: 10, bottom: 10, left: 10 },
-                animated: true,
-            }
+            edgePadding: { top: 10, right: 10, bottom: 10, left: 10 },
+            animated: true,
+        }
         );
     }
 
@@ -141,7 +163,7 @@ export default class MapScreen extends React.Component {
                         />
                         {this.state.points.map(marker => (
                             <Marker
-                                onCalloutPress={() => this.props.navigation.navigate('AboutMarker', {...marker, walk: this.state})}
+                                onCalloutPress={() => this.props.navigation.navigate('AboutMarker', { ...marker, walk: this.state })}
                                 coordinate={marker.coords}
                                 title={marker.title}
                                 ref={marker.title}

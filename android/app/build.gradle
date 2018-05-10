@@ -138,6 +138,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-track-player')
     compile project(':react-native-android-location-services-dialog-box')
     compile project(':react-native-keep-awake')
     compile project(':react-native-mauron85-background-geolocation')

@@ -66,7 +66,7 @@ export default class MapScreen extends React.Component {
                     stopWithApp: true,
                     capabilities: [
                         TrackPlayer.CAPABILITY_PLAY,
-                        TrackPlayer.CAPABILITY_PAUSE,
+                        TrackPlayer.CAPABILITY_PAUSE
                     ]
                 });
             });
@@ -178,16 +178,16 @@ export default class MapScreen extends React.Component {
                     <Button style={styles.button_map} onPress={this.centerMap}>
                         <Text style={{ color: '#fff' }}>Recentrer</Text>
                     </Button>
-                        {(PlayerStore.playbackState === TrackPlayer.STATE_PLAYING || PlayerStore.playbackState === TrackPlayer.STATE_BUFFERING) ? (
+                    {(PlayerStore.playbackState === TrackPlayer.STATE_PLAYING || PlayerStore.playbackState === TrackPlayer.STATE_BUFFERING) ? (
                         <Button onPress={() => TrackPlayer.pause()} style={styles.button_audio}>
                             <Icon name='pause' />
                         </Button>
-                        ) : null} 
-                        {(PlayerStore.playbackState === TrackPlayer.STATE_PAUSED) ? (
-                            <Button onPress={() => TrackPlayer.play()} style={styles.button_audio}>
+                    ) : null}
+                    {(PlayerStore.playbackState === TrackPlayer.STATE_PAUSED) ? (
+                        <Button onPress={() => TrackPlayer.play()} style={styles.button_audio}>
                             <Icon name='play' />
-                            </Button>
-                        ): null}
+                        </Button>
+                    ) : null}
                     <KeepAwake />
                 </Container>
             </StyleProvider>

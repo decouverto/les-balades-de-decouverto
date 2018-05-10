@@ -60,7 +60,7 @@ export default class AboutMarker extends Component {
                 this.setState({currentPlaying: true});
             } else {
                 TrackPlayer.getCurrentTrack().then((current) => {
-                    if (PlayerStore.playbackState === TrackPlayer.STATE_PAUSED && current == this.state.sound) {
+                    if ((PlayerStore.playbackState === TrackPlayer.STATE_PAUSED || PlayerStore.playbackState === TrackPlayer.STATE_STOPPED) && current == this.state.sound) {
                         TrackPlayer.play();
                         this.setState({currentPlaying: true});
                     } else if (current != this.state.sound) {

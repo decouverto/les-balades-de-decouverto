@@ -62,16 +62,6 @@ export default class MapScreen extends React.Component {
                     ]
                 });
             });
-            var track = [];
-            this.state.points.forEach((val) => {
-                track.push({
-                    id: val.sound,
-                    url: 'file://' + rootDirectory + this.state.id + '/sounds/' + val.sound, 
-                    title: val.title,
-                    album: this.state.title
-                })
-            })
-            TrackPlayer.add(track);
         }).catch((error) => {
             this.props.navigation.navigate('AboutWalk', this.state);
         });
@@ -171,13 +161,13 @@ export default class MapScreen extends React.Component {
                             />
                         ))}
                     </MapView>
-                    <Button style={styles.button_next} onPress={() => this.nextMarker()}>
+                    <Button style={styles.button_next} onPress={this.nextMarker}>
                         <Icon name='ios-arrow-forward-outline' />
                     </Button>
-                    <Button style={styles.button_prev} onPress={() => this.prevMarker()}>
+                    <Button style={styles.button_prev} onPress={this.prevMarker}>
                         <Icon name='ios-arrow-back' />
                     </Button>
-                    <Button style={styles.button_map} onPress={() => this.centerMap()}>
+                    <Button style={styles.button_map} onPress={this.centerMap}>
                         <Text style={{ color: '#fff' }}>Recentrer</Text>
                     </Button>
                     <KeepAwake />

@@ -39,21 +39,46 @@ export default class AboutMarker extends Component {
 
 
     componentDidMount() {
-
-
+        TrackPlayer.getCurrentTrack().then((current) => {
+            this.setState({currentPlaying:(current == this.state.sound)});
+        }).catch(() => {
+            this.setState({currentPlaying:true});
+        })
     }
 
 
     togglePlayback() {
-        TrackPlayer.getCurrentTrack().then((current) => {
-            if (PlayerStore.playbackState === TrackPlayer.STATE_PAUSED) {
+        TrackPlayer.getPosition().then((position)=> {
+            if (position == 0) {
+                TrackPlayer.add([{
+                    id: this.state.sound,
+                    url: 'file://' + rootDirectory + this.state.walk.id + '/sounds/' + this.state.sound, 
+                    title: this.state.title,
+                    album: this.state.walk.title
+                }])
                 TrackPlayer.play();
-            } else if (current != this.state.sound) {
-                TrackPlayer.pause();
-                TrackPlayer.skip(this.state.sound);
-                TrackPlayer.play();
+                this.setState({currentPlaying: true});
             } else {
-                TrackPlayer.pause();
+                TrackPlayer.getCurrentTrack().then((current) => {
+                    if (PlayerStore.playbackState === TrackPlayer.STATE_PAUSED && current == this.state.sound) {
+                        TrackPlayer.play();
+                        this.setState({currentPlaying: true});
+                    } else if (current != this.state.sound) {
+                        this.changingTrack = true;
+                        TrackPlayer.reset();
+                        TrackPlayer.add([{
+                            id: this.state.sound,
+                            url: 'file://' + rootDirectory + this.state.walk.id + '/sounds/' + this.state.sound, 
+                            title: this.state.title,
+                            album: this.state.walk.title
+                        }]);
+                        TrackPlayer.play();
+                        this.setState({currentPlaying: true});
+                        this.changingTrack = false;
+                    } else {
+                        TrackPlayer.pause();
+                    }
+                });
             }
         });
     }
@@ -95,7 +120,7 @@ export default class AboutMarker extends Component {
                                     <H1>Explications audio</H1>
                                 </Row>
                                 <Row>
-                                    {(PlayerStore.playbackState === TrackPlayer.STATE_PLAYING || PlayerStore.playbackState === TrackPlayer.STATE_BUFFERING) ? (
+                                    {((PlayerStore.playbackState === TrackPlayer.STATE_PLAYING || PlayerStore.playbackState === TrackPlayer.STATE_BUFFERING) && this.state.currentPlaying && !this.changingTrack) ? (
                                         <Button iconRight onPress={this.togglePlayback}>
                                             <Text>Pause </Text>
                                             <Icon name='pause' />

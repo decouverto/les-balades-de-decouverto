@@ -5,7 +5,8 @@ import AboutMarkerScreen from './app/screens/about-marker.js';
 import MapScreen from './app/screens/map.js';
 import SideBar from './app/components/sidebar/sidebar.js';
 import { DrawerNavigator } from 'react-navigation';
-const App = DrawerNavigator(
+import { Root } from 'native-base';
+const AppNavigator = DrawerNavigator(
   {
     Home: { screen: HomeScreen },
     AboutWalk: { screen: AboutWalkScreen },
@@ -17,4 +18,4 @@ const App = DrawerNavigator(
   }
 );
 
-export default App;
+export default () => <Root><AppNavigator /></Root>;

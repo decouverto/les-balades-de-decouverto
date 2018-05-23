@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar, Alert, Linking, AsyncStorage, Dimensions, StyleSheet, View } from 'react-native';
-import { Container, Header, Title, Left, Icon, Right, Body, Content, Text, StyleProvider, Button } from 'native-base';
+import { Container, Header, Title, Left, Icon, Right, Body, Content, Text, StyleProvider, Button, ActionSheet } from 'native-base';
 
 import { observer } from 'mobx-react';
 
@@ -137,7 +137,25 @@ export default class MapScreen extends React.Component {
                         <Body>
                             <Title>Carte</Title>
                         </Body>
-                        <Right />
+                        <Right>
+                            <Button transparent onPress={() => 
+                                ActionSheet.show(
+                                    {
+                                        options: this.state.points.map(i => i.title),
+                                        cancelButtonIndex: 'Annuler',
+                                        title: 'Navigation rapide'
+                                    },
+                                    pointIndex => {
+                                        if (pointIndex !== 'Annuler') {
+                                            this.props.navigation.navigate('AboutMarker', { ...this.state.points[pointIndex], walk: this.state });
+                                        }
+                                        
+                                    }
+                                )}
+                            >
+                                <Icon name='list' />
+                            </Button>
+                        </Right>
                     </Header>
                     <MapView
                         initialRegion={{

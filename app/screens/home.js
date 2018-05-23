@@ -27,7 +27,9 @@ export default class HomeScreen extends React.Component {
             if (values !== null && !err) {
                 var obj = {};
                 for (var i in values) {
-                    obj[values[i][0]]=JSON.parse(values[i][1]);
+                    if (values[i][1] != null) {
+                        obj[values[i][0]]=JSON.parse(values[i][1]);
+                    }
                 }
                 this.setState(obj);
             }

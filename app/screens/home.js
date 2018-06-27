@@ -1,6 +1,6 @@
 import React from 'react';
-import { StatusBar, AsyncStorage, Alert } from 'react-native';
-import { Container, Header, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, List, ListItem } from 'native-base';
+import { StatusBar, AsyncStorage, Alert, View } from 'react-native';
+import { Container, Header, Picker, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, List, ListItem, Form } from 'native-base';
 
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
@@ -28,7 +28,7 @@ export default class HomeScreen extends React.Component {
                 var obj = {};
                 for (var i in values) {
                     if (values[i][1] != null) {
-                        obj[values[i][0]]=JSON.parse(values[i][1]);
+                        obj[values[i][0]] = JSON.parse(values[i][1]);
                     }
                 }
                 this.setState(obj);
@@ -163,7 +163,38 @@ export default class HomeScreen extends React.Component {
         })
     }
 
+    onSectorChange(sector) {
+        this.setState({
+            selectedSector: sector
+        });
+    }
+
+    onThemeChange(theme) {
+        this.setState({
+            selectedTheme: theme
+        });
+    }
+
     render() {
+        if (this.state.walks != null && this.state.walks.length > 1) {
+            var sectors = [];
+            var themes = [];
+            this.state.walks.forEach((data) => {
+                if (sectors.indexOf(data.zone) < 0) {
+                    sectors.push(data.zone);
+                }
+                if (themes.indexOf(data.theme) < 0) {
+                    themes.push(data.theme);
+                }
+            });
+            var sectorsDiv = sectors.map((value, i) => {
+                return <Picker.Item label={value} key={i + '-zone'} value={value} />
+            });
+            var themesDiv = themes.map((value, i) => {
+                return <Picker.Item label={value} key={i + '-theme'} value={value} />
+            });
+        }
+
         return (
             <StyleProvider style={getTheme(material)} >
                 <Container>
@@ -181,6 +212,32 @@ export default class HomeScreen extends React.Component {
                         <Right />
                     </Header>
                     <Content padder>
+                        {(this.state.walks != null && this.state.walks.length > 1) ? (
+                            <View>
+                                <Form>
+                                    <Text>Secteur</Text>
+                                    <Picker
+                                        mode='dropdown'
+                                        selectedValue={this.state.selectedSector}
+                                        onValueChange={this.onSectorChange.bind(this)}
+                                    >
+                                        <Picker.Item label={'Tous'} key={'all-picker-sector'} value={'all'} />
+                                        {sectorsDiv}
+                                    </Picker>
+                                </Form>
+                                <Form>
+                                    <Text>Thème</Text>
+                                    <Picker
+                                        mode='dropdown'
+                                        selectedValue={this.state.selectedTheme}
+                                        onValueChange={this.onThemeChange.bind(this)}
+                                    >
+                                        <Picker.Item label={'Tous'} key={'all-picker-theme'} value={'all'} />
+                                        {themesDiv}
+                                    </Picker>
+                                </Form>
+                            </View>
+                        ) : null}
                         <H1>Balades</H1>
                         <List
                             dataArray={this.state.walks}

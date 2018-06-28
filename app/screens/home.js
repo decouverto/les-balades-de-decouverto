@@ -18,7 +18,7 @@ export default class HomeScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { errLoading: false, walks: [], downloadedWalks: [] }
+        this.state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], selectedSector: 'all', selectedTheme: 'all' }
     }
 
     componentDidMount() {
@@ -31,6 +31,10 @@ export default class HomeScreen extends React.Component {
                         obj[values[i][0]] = JSON.parse(values[i][1]);
                     }
                 }
+                
+                if (obj.hasOwnProperty('walks')) {
+                    obj.wlkToDisplay = obj.walks
+                }
                 this.setState(obj);
             }
             fetch(rootURL + 'index.json')
@@ -39,7 +43,8 @@ export default class HomeScreen extends React.Component {
                     if (this._mounted) {
                         this.setState({
                             errLoading: false,
-                            walks: responseJson
+                            walks: responseJson,
+                            wlkToDisplay: responseJson
                         });
                     }
                     AsyncStorage.setItem('walks', JSON.stringify(responseJson));
@@ -104,7 +109,6 @@ export default class HomeScreen extends React.Component {
                                 );
                             })
                             .catch((e) => {
-                                console.log(e)
                                 Alert.alert(
                                     'Erreur',
                                     'Erreur lors de la suppression du fichier temporaire',
@@ -163,16 +167,33 @@ export default class HomeScreen extends React.Component {
         })
     }
 
+    calculateWlkToDisplay () {
+        var arr = [];
+        this.state.walks.forEach((data) => {
+            let err = false;
+            if (this.state.selectedSector != 'all' && this.state.selectedSector != data.zone) {
+                err = true;
+            }
+            if (this.state.selectedTheme != 'all' && this.state.selectedTheme != data.theme) {
+                err = true;
+            }
+            if (!err) {
+                arr.push(data);
+            }
+        })
+        this.setState({wlkToDisplay: arr})
+    }
+
     onSectorChange(sector) {
         this.setState({
             selectedSector: sector
-        });
+        }, () => this.calculateWlkToDisplay());
     }
 
     onThemeChange(theme) {
         this.setState({
             selectedTheme: theme
-        });
+        }, () => this.calculateWlkToDisplay());
     }
 
     render() {
@@ -194,7 +215,7 @@ export default class HomeScreen extends React.Component {
                 return <Picker.Item label={value} key={i + '-theme'} value={value} />
             });
         }
-
+        
         return (
             <StyleProvider style={getTheme(material)} >
                 <Container>
@@ -240,7 +261,7 @@ export default class HomeScreen extends React.Component {
                         ) : null}
                         <H1>Balades</H1>
                         <List
-                            dataArray={this.state.walks}
+                            dataArray={this.state.wlkToDisplay}
                             renderRow={data => {
                                 return (
                                     <ListItem>

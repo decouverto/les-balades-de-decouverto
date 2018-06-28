@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar, AsyncStorage, Alert, View } from 'react-native';
-import { Container, Header, Picker, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, List, ListItem, Form } from 'native-base';
+import { Container, Header, Picker, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, List, ListItem, Form, Item, Input } from 'native-base';
 
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
@@ -18,7 +18,7 @@ export default class HomeScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], selectedSector: 'all', selectedTheme: 'all' }
+        this.state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], selectedSector: 'all', selectedTheme: 'all', search: '' }
     }
 
     componentDidMount() {
@@ -31,7 +31,7 @@ export default class HomeScreen extends React.Component {
                         obj[values[i][0]] = JSON.parse(values[i][1]);
                     }
                 }
-                
+
                 if (obj.hasOwnProperty('walks')) {
                     obj.wlkToDisplay = obj.walks
                 }
@@ -167,7 +167,7 @@ export default class HomeScreen extends React.Component {
         })
     }
 
-    calculateWlkToDisplay () {
+    calculateWlkToDisplay() {
         var arr = [];
         this.state.walks.forEach((data) => {
             let err = false;
@@ -177,11 +177,16 @@ export default class HomeScreen extends React.Component {
             if (this.state.selectedTheme != 'all' && this.state.selectedTheme != data.theme) {
                 err = true;
             }
+            if (this.state.search != '') {
+                if (data.zone.search(this.state.search) == -1 && data.theme.search(this.state.search) == -1 && data.description.search(this.state.search) == -1 && data.title.search(this.state.search) == -1) {
+                    err = true;
+                }            
+            }
             if (!err) {
                 arr.push(data);
             }
         })
-        this.setState({wlkToDisplay: arr})
+        this.setState({ wlkToDisplay: arr })
     }
 
     onSectorChange(sector) {
@@ -193,6 +198,12 @@ export default class HomeScreen extends React.Component {
     onThemeChange(theme) {
         this.setState({
             selectedTheme: theme
+        }, () => this.calculateWlkToDisplay());
+    }
+
+    onSearch(search) {
+        this.setState({
+            search: search
         }, () => this.calculateWlkToDisplay());
     }
 
@@ -215,7 +226,7 @@ export default class HomeScreen extends React.Component {
                 return <Picker.Item label={value} key={i + '-theme'} value={value} />
             });
         }
-        
+
         return (
             <StyleProvider style={getTheme(material)} >
                 <Container>
@@ -235,6 +246,12 @@ export default class HomeScreen extends React.Component {
                     <Content padder>
                         {(this.state.walks != null && this.state.walks.length > 1) ? (
                             <View>
+                                <Form>
+                                    <Item>
+                                        <Icon name='ios-search' />
+                                        <Input placeholder='Recherche' onChangeText={this.onSearch.bind(this)} value={this.state.search} />
+                                    </Item>
+                                </Form>
                                 <Form>
                                     <Text>Secteur</Text>
                                     <Picker

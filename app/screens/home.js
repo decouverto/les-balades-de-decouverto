@@ -18,7 +18,7 @@ export default class HomeScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], selectedSector: 'all', selectedTheme: 'all', search: '' }
+        this.state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], selectedSector: 'all', selectedTheme: 'all', search: '', searching: false }
     }
 
     componentDidMount() {
@@ -180,7 +180,7 @@ export default class HomeScreen extends React.Component {
             if (this.state.search != '') {
                 if (data.zone.search(this.state.search) == -1 && data.theme.search(this.state.search) == -1 && data.description.search(this.state.search) == -1 && data.title.search(this.state.search) == -1) {
                     err = true;
-                }            
+                }
             }
             if (!err) {
                 arr.push(data);
@@ -241,17 +241,25 @@ export default class HomeScreen extends React.Component {
                         <Body>
                             <Title>Découverto</Title>
                         </Body>
-                        <Right />
+                        <Right>
+                            <Button
+                                transparent
+                                onPress={() => this.setState({ searching: !this.state.searching, selectedTheme: 'all', selectedSector: 'all', search: '' }, () => this.calculateWlkToDisplay())}>
+                                <Icon name='search' />
+                            </Button>
+                        </Right>
                     </Header>
                     <Content padder>
-                        {(this.state.walks != null && this.state.walks.length > 1) ? (
+                        {(this.state.searching) ? (
+                            <Form>
+                                <Item style={{ marginBottom: 10 }}>
+                                    <Icon name='ios-search' />
+                                    <Input placeholder='Recherche' onChangeText={this.onSearch.bind(this)} value={this.state.search} />
+                                </Item>
+                            </Form>
+                        ) : null}
+                        {(this.state.walks != null && this.state.walks.length > 1 && !this.state.searching) ? (
                             <View>
-                                <Form>
-                                    <Item>
-                                        <Icon name='ios-search' />
-                                        <Input placeholder='Recherche' onChangeText={this.onSearch.bind(this)} value={this.state.search} />
-                                    </Item>
-                                </Form>
                                 <Form>
                                     <Text>Secteur</Text>
                                     <Picker

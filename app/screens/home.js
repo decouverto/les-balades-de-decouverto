@@ -202,26 +202,25 @@ export default class HomeScreen extends React.Component {
     onSectorChange(sector) {
         this.setState({
             selectedSector: sector
-        }, () => this.calculateWlkToDisplay());
+        }, this.calculateWlkToDisplay);
     }
 
     onThemeChange(theme) {
         this.setState({
             selectedTheme: theme
-        }, () => this.calculateWlkToDisplay());
+        }, this.calculateWlkToDisplay);
     }
 
     onTypeChange(type) {
         this.setState({
             selectedType: type
-        }, () => this.calculateWlkToDisplay());
+        }, this.calculateWlkToDisplay);
     }
-
 
     onSearch(search) {
         this.setState({
             search: search
-        }, () => this.calculateWlkToDisplay());
+        }, this.calculateWlkToDisplay);
     }
 
     render() {

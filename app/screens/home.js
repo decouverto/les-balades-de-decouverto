@@ -18,7 +18,11 @@ export default class HomeScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: false }
+        let state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: false }
+        if (this.props.navigation.state.params && this.props.navigation.state.params.hasOwnProperty('selectedType')) {
+            state.selectedType = this.props.navigation.state.params.selectedType;
+        }
+        this.state = state;
     }
 
     componentDidMount() {
@@ -46,6 +50,7 @@ export default class HomeScreen extends React.Component {
                             walks: responseJson,
                             wlkToDisplay: responseJson
                         });
+                        this.calculateWlkToDisplay();
                     }
                     AsyncStorage.setItem('walks', JSON.stringify(responseJson));
                 })
@@ -177,7 +182,7 @@ export default class HomeScreen extends React.Component {
             if (this.state.selectedTheme != 'all' && this.state.selectedTheme != data.theme) {
                 err = true;
             }
-            if (this.state.selectedSector != 'all' && this.state.selectedType != data.fromBook) {
+            if (this.state.selectedType != 'all' && this.state.selectedType != data.fromBook) {
                 err = true;
             }
             if (this.state.search != '') {

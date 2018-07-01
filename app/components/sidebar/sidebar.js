@@ -60,7 +60,13 @@ export default class SideBar extends React.Component {
                         }}>
                         <Icon name='ios-pin' /><Text> Partager ma position</Text>
                     </ListItem>
-
+                    <ListItem
+                        button
+                        onPress={() => {
+                                this.props.navigation.navigate('Home', {selectedType: true});
+                        }}>
+                        <Icon name='ios-book' /><Text> Balades des livres</Text>
+                    </ListItem>
                 </Content>
             </Container>
         );

@@ -15,9 +15,9 @@ export default (variables = variable) => {
     },
     ".book-background": {
       "NativeBase.CardItem": {
-        backgroundColor: "#d4ff9b",
+        backgroundColor: "#ebf9ff",
         "NativeBase.Button.light": {
-          backgroundColor: "#efeccd"
+          backgroundColor: "#ebf9ff"
         }
       },
     },

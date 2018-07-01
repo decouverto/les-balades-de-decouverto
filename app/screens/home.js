@@ -315,12 +315,17 @@ export default class HomeScreen extends React.Component {
                                                     <Body>
                                                         <H3>{data.title}</H3>
                                                         <Text note>{(data.distance / 1000).toFixed(1)}km</Text>
+                                                        {(data.fromBook) ? (
+                                                            <Text note>Tracet uniquement</Text>
+                                                        ) : (
+                                                            <Text note>Balade commentée</Text>
+                                                        )}
                                                     </Body>
                                                 </Left>
                                             </CardItem>
                                             <CardItem>
                                                 <Body>
-                                                    <Text>{data.description}</Text>
+                                                    <Text italic={data.fromBook}>{data.description}</Text>
                                                 </Body>
                                             </CardItem>
                                             {(downloaded) ? (

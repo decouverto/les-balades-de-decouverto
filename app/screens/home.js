@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatusBar, AsyncStorage, Alert, View } from 'react-native';
+import { StatusBar, AsyncStorage, Alert, View, StyleSheet } from 'react-native';
 import { Container, Header, Picker, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, List, ListItem, Form, Item, Input } from 'native-base';
 
 import getTheme from '../../native-base-theme/components';
@@ -18,7 +18,7 @@ export default class HomeScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], selectedSector: 'all', selectedTheme: 'all', search: '', searching: false }
+        this.state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: false }
     }
 
     componentDidMount() {
@@ -177,6 +177,9 @@ export default class HomeScreen extends React.Component {
             if (this.state.selectedTheme != 'all' && this.state.selectedTheme != data.theme) {
                 err = true;
             }
+            if (this.state.selectedSector != 'all' && this.state.selectedType != data.fromBook) {
+                err = true;
+            }
             if (this.state.search != '') {
                 if (data.zone.search(this.state.search) == -1 && data.theme.search(this.state.search) == -1 && data.description.search(this.state.search) == -1 && data.title.search(this.state.search) == -1) {
                     err = true;
@@ -200,6 +203,13 @@ export default class HomeScreen extends React.Component {
             selectedTheme: theme
         }, () => this.calculateWlkToDisplay());
     }
+
+    onTypeChange(type) {
+        this.setState({
+            selectedType: type
+        }, () => this.calculateWlkToDisplay());
+    }
+
 
     onSearch(search) {
         this.setState({
@@ -244,7 +254,7 @@ export default class HomeScreen extends React.Component {
                         <Right>
                             <Button
                                 transparent
-                                onPress={() => this.setState({ searching: !this.state.searching, selectedTheme: 'all', selectedSector: 'all', search: '' }, () => this.calculateWlkToDisplay())}>
+                                onPress={() => this.setState({ searching: !this.state.searching, selectedTheme: 'all', selectedSector: 'all', selectedType: 'all', search: '' }, () => this.calculateWlkToDisplay())}>
                                 <Icon name='search' />
                             </Button>
                         </Right>
@@ -270,8 +280,6 @@ export default class HomeScreen extends React.Component {
                                         <Picker.Item label={'Tous'} key={'all-picker-sector'} value={'all'} />
                                         {sectorsDiv}
                                     </Picker>
-                                </Form>
-                                <Form>
                                     <Text>Thème</Text>
                                     <Picker
                                         mode='dropdown'
@@ -281,6 +289,16 @@ export default class HomeScreen extends React.Component {
                                         <Picker.Item label={'Tous'} key={'all-picker-theme'} value={'all'} />
                                         {themesDiv}
                                     </Picker>
+                                    <Text>Type</Text>
+                                    <Picker
+                                        mode='dropdown'
+                                        selectedValue={this.state.selectedType}
+                                        onValueChange={this.onTypeChange.bind(this)}
+                                    >
+                                        <Picker.Item label={'Tous'} key={'all-picker-type'} value={'all'} />
+                                        <Picker.Item label={'Tracet uniquement'} key={'book-picker-type'} value={true} />
+                                        <Picker.Item label={'Balade commentée'} key={'other-picker-type'} value={false} />
+                                    </Picker>
                                 </Form>
                             </View>
                         ) : null}
@@ -288,9 +306,10 @@ export default class HomeScreen extends React.Component {
                         <List
                             dataArray={this.state.wlkToDisplay}
                             renderRow={data => {
+                                let downloaded = this.isDownloaded(data.id);
                                 return (
                                     <ListItem>
-                                        <Card>
+                                        <Card red-border={downloaded} book-background={data.fromBook} >
                                             <CardItem header>
                                                 <Left>
                                                     <Body>
@@ -304,13 +323,17 @@ export default class HomeScreen extends React.Component {
                                                     <Text>{data.description}</Text>
                                                 </Body>
                                             </CardItem>
-                                            {(this.isDownloaded(data.id)) ? (
-                                                <CardItem footer button onPress={() => this.openWalk(data)}>
-                                                    <Text>Ouvrir</Text>
+                                            {(downloaded) ? (
+                                                <CardItem footer>
+                                                    <Button light onPress={() => this.openWalk(data)}>
+                                                        <Text>Ouvrir</Text>
+                                                    </Button>
                                                 </CardItem>
                                             ) : (
-                                                    <CardItem footer button onPress={() => this.downloadWalk(data)}>
-                                                        <Text>Télécharger</Text>
+                                                    <CardItem footer>
+                                                        <Button light onPress={() => this.downloadWalk(data)}>
+                                                            <Text>Télécharger</Text>
+                                                        </Button>
                                                     </CardItem>
                                                 )}
                                         </Card>

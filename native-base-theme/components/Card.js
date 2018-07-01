@@ -9,6 +9,18 @@ export default (variables = variable) => {
       shadowRadius: null,
       elevation: null
     },
+    ".red-border": {
+      borderColor: "#dc3133",
+      borderWidth: 2
+    },
+    ".book-background": {
+      "NativeBase.CardItem": {
+        backgroundColor: "#d4ff9b",
+        "NativeBase.Button.light": {
+          backgroundColor: "#efeccd"
+        }
+      },
+    },
     marginVertical: 5,
     marginHorizontal: 2,
     flex: 1,

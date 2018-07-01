@@ -38,7 +38,7 @@ export default class AboutWalkScreen extends React.Component {
                                 AsyncStorage.getItem('downloadedWalks', (err, value) => {
                                     if (value !== null && !err) {
                                         let list = JSON.parse(value);
-                                        list.splice(list.splice(id, 1), 1);
+                                        list.splice(id, 1);
                                         AsyncStorage.setItem('downloadedWalks', JSON.stringify(list));
                                         this.props.navigation.navigate('Home');
                                         Alert.alert(

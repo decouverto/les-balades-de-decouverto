@@ -34,6 +34,6 @@
     "react-native-splash-screen": "^3.0.6",
     "react-native-track-player": "^0.2.3",
     "react-native-zip-archive": "^2.2.3",
-    "react-navigation": "^1.5.11"
+    "react-navigation": "^1.5.12"
   }
 }

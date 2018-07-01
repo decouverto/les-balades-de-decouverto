@@ -35,11 +35,7 @@ export default class HomeScreen extends React.Component {
                         obj[values[i][0]] = JSON.parse(values[i][1]);
                     }
                 }
-
-                if (obj.hasOwnProperty('walks')) {
-                    obj.wlkToDisplay = obj.walks
-                }
-                this.setState(obj);
+                this.setState(obj, this.calculateWlkToDisplay);
             }
             fetch(rootURL + 'index.json')
                 .then((response) => response.json())
@@ -47,10 +43,8 @@ export default class HomeScreen extends React.Component {
                     if (this._mounted) {
                         this.setState({
                             errLoading: false,
-                            walks: responseJson,
-                            wlkToDisplay: responseJson
-                        });
-                        this.calculateWlkToDisplay();
+                            walks: responseJson
+                        }, this.calculateWlkToDisplay);
                     }
                     AsyncStorage.setItem('walks', JSON.stringify(responseJson));
                 })
@@ -61,6 +55,14 @@ export default class HomeScreen extends React.Component {
                 });
             SplashScreen.hide();
         });
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.navigation.state.params && nextProps.navigation.state.params.hasOwnProperty('selectedType')) {
+            this.setState({
+                selectedType: nextProps.navigation.state.params.selectedType
+            }, this.calculateWlkToDisplay);
+        }
     }
 
     componentWillUnmount() {

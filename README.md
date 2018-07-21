@@ -11,6 +11,7 @@ Below you'll find information about performing common tasks. The most recent ver
 ## Table of Contents
 
 * [Google Maps API key](#google-maps)
+* [Test Deep Links](#test-deep-links)
 * [Available Scripts](#available-scripts)
   * [npm start](#npm-start)
   * [npm test](#npm-test)
@@ -31,6 +32,16 @@ Before compaling you will have to get a [Google Maps API key](https://developers
 ```
 
 To make sure that you don't commit the key please execute: `git update-index --assume-unchanged android/app/src/main/res/values/string.xml`
+
+## Test Deep Links
+
+```
+adb shell am start -W -a android.intent.action.VIEW -d "https://decouverto.fr/preview/jYW1cN8" com.lesbaladesdedecouverto
+```
+or
+```
+adb shell am start -W -a android.intent.action.VIEW -d "decouverto://decouverto/preview/jYW1cN8" com.lesbaladesdedecouverto
+```
 
 ## Available Scripts
 

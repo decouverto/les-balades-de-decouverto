@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatusBar, AsyncStorage, Alert, View, StyleSheet } from 'react-native';
+import { Platform, Linking, StatusBar, AsyncStorage, Alert, View, StyleSheet } from 'react-native';
 import { Container, Header, Picker, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, List, ListItem, Form, Item, Input } from 'native-base';
 
 import getTheme from '../../native-base-theme/components';
@@ -35,7 +35,18 @@ export default class HomeScreen extends React.Component {
                         obj[values[i][0]] = JSON.parse(values[i][1]);
                     }
                 }
-                this.setState(obj, this.calculateWlkToDisplay);
+                this.setState(obj, () => {
+                    if (Platform.OS === 'android') {
+                        Linking.getInitialURL().then(url => {
+                          this.openDeepLink(url);
+                        });
+                    } else {
+                        Linking.addEventListener('url', function (event) {
+                            this.openDeepLink(event.url);
+                        });
+                    }
+                    this.calculateWlkToDisplay()
+                });
             }
             fetch(rootURL + 'index.json')
                 .then((response) => response.json())
@@ -44,7 +55,20 @@ export default class HomeScreen extends React.Component {
                         this.setState({
                             errLoading: false,
                             walks: responseJson
-                        }, this.calculateWlkToDisplay);
+                        }, () => {
+                            if (this.state.wlkToDisplay.legnth == 0) {
+                                if (Platform.OS === 'android') {
+                                    Linking.getInitialURL().then(url => {
+                                    this.openDeepLink(url);
+                                    });
+                                } else {
+                                    Linking.addEventListener('url', function (event) {
+                                        this.openDeepLink(event.url);
+                                    });
+                                }
+                            }
+                            this.calculateWlkToDisplay();
+                        });
                     }
                     AsyncStorage.setItem('walks', JSON.stringify(responseJson));
                 })
@@ -67,6 +91,17 @@ export default class HomeScreen extends React.Component {
 
     componentWillUnmount() {
         this._mounted = false;
+    }
+
+    openDeepLink = (url) => {
+        if (url) {
+            const route = url.replace(/.*?:\/\//g, '');
+            const id = route.match(/\/([^\/]+)\/?$/)[1];
+            const routeName = route.split('/')[1];
+            if (routeName === 'preview') {
+                this.calculateWlkToDisplay(id)
+            }
+        }
     }
 
     createDirectory(id, cb) {
@@ -174,7 +209,15 @@ export default class HomeScreen extends React.Component {
         })
     }
 
-    calculateWlkToDisplay() {
+    calculateWlkToDisplay(id) {
+        if (id) {
+            var found = this.state.walks.find(function(element) {
+                return element.id === id;
+            });
+            if (found) {
+                return this.setState({ wlkToDisplay: [found], searching: true, search: found.title });
+            }
+        }
         var arr = [];
         this.state.walks.forEach((data) => {
             let err = false;
@@ -324,8 +367,8 @@ export default class HomeScreen extends React.Component {
                                                         {(data.fromBook) ? (
                                                             <Text note>Tracet uniquement</Text>
                                                         ) : (
-                                                            <Text note>Balade commentée</Text>
-                                                        )}
+                                                                <Text note>Balade commentée</Text>
+                                                            )}
                                                     </Body>
                                                 </Left>
                                             </CardItem>

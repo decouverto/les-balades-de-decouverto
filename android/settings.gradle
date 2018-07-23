@@ -20,3 +20,5 @@ project(':react-native-maps').projectDir = new File(rootProject.projectDir, '../
 include ':app'
 include ':react-native-fs'
 project(':react-native-fs').projectDir = new File(settingsDir, '../node_modules/react-native-fs/android')
+include ':react-native-push-notification'
+project(':react-native-push-notification').projectDir = file('../node_modules/react-native-push-notification/android')

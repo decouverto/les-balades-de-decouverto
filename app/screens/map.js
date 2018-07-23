@@ -20,6 +20,12 @@ import TrackPlayer from 'react-native-track-player';
 import PlayerStore from '../stores/player';
 
 
+import distanceBtwPoints from 'distance-between-points';
+import PushNotification from 'react-native-push-notification';
+import getExtremums from 'get-extremums';
+
+let currentNotification = false;
+
 @observer
 export default class MapScreen extends React.Component {
 
@@ -58,6 +64,29 @@ export default class MapScreen extends React.Component {
                 if (this.refs.mapElement) {
                     let userLocation = { longitude: data.longitude, latitude: data.latitude };
                     this.setState({ userLocation });
+                }
+                var list = [];
+                this.state.points.forEach((point) => {
+                    list.push({
+                        d: distanceBtwPoints(data, point.coords),
+                        title: point.title
+                    });
+                });
+                var nearest = getExtremums(list, 'd').lowest;
+                if (nearest.d <= 70) {
+                    if (currentNotification != nearest.title) {
+                        PushNotification.cancelAllLocalNotifications();
+                        var opts = {
+                            bigText: 'Nouvel extrait audio à écouter: ' + nearest.title,
+                            title: 'Nouvel extrait audio',
+                            message: nearest.title
+                        };
+                        PushNotification.localNotification(opts);
+                        currentNotification = nearest.title;
+                    }
+                } else {
+                    PushNotification.cancelAllLocalNotifications();
+                    currentNotification = false;
                 }
             });
             BackgroundGeolocation.start();
@@ -138,7 +167,7 @@ export default class MapScreen extends React.Component {
                             <Title>Carte</Title>
                         </Body>
                         <Right>
-                            <Button transparent onPress={() => 
+                            <Button transparent onPress={() =>
                                 ActionSheet.show(
                                     {
                                         options: this.state.points.map(i => i.title),
@@ -149,7 +178,7 @@ export default class MapScreen extends React.Component {
                                         if (pointIndex !== 'Annuler') {
                                             this.props.navigation.navigate('AboutMarker', { ...this.state.points[pointIndex], walk: this.state });
                                         }
-                                        
+
                                     }
                                 )}
                             >

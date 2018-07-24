@@ -2,7 +2,7 @@
 
 The application to discover history through rides from Découverto.
 
-![Logo](logo.jpg)
+![Logo](icon.jpg)
 
 This project was bootstrapped with [Create React Native App](https://github.com/react-community/create-react-native-app).
 

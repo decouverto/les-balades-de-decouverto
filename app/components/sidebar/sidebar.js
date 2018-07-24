@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppRegistry, Image, StatusBar, Alert, Share } from 'react-native';
+import { AppRegistry, Image, StatusBar, Alert, Share, Linking } from 'react-native';
 import { Container, Content, Text, List, ListItem, View, Icon } from 'native-base';
 const routes = [{
     way: 'Home', text: 'Accueil', icon: 'ios-home'
@@ -40,6 +40,20 @@ export default class SideBar extends React.Component {
                     <ListItem
                         button
                         onPress={() => {
+                                this.props.navigation.navigate('Home', {selectedType: true});
+                        }}>
+                        <Icon name='ios-book' /><Text> Balades des livres</Text>
+                    </ListItem>
+                    <ListItem
+                        button
+                        onPress={() => {
+                            Linking.openURL('https://www.decouverto.fr');
+                        }}>
+                        <Icon name='ios-globe' /><Text> Site internet</Text>
+                    </ListItem>
+                    <ListItem
+                        button
+                        onPress={() => {
                             navigator.geolocation.getCurrentPosition((location) => {
                                 var date = new Date();
                                 date.setTime(location.timestamp);
@@ -59,13 +73,6 @@ export default class SideBar extends React.Component {
                             }, { enableHighAccuracy: true });
                         }}>
                         <Icon name='ios-pin' /><Text> Partager ma position</Text>
-                    </ListItem>
-                    <ListItem
-                        button
-                        onPress={() => {
-                                this.props.navigation.navigate('Home', {selectedType: true});
-                        }}>
-                        <Icon name='ios-book' /><Text> Balades des livres</Text>
                     </ListItem>
                 </Content>
             </Container>

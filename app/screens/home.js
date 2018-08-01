@@ -98,7 +98,7 @@ export default class HomeScreen extends React.Component {
             const route = url.replace(/.*?:\/\//g, '');
             const id = route.match(/\/([^\/]+)\/?$/)[1];
             const routeName = route.split('/')[1];
-            if (routeName === 'preview') {
+            if (routeName === 'rando') {
                 this.calculateWlkToDisplay(id)
             }
         }

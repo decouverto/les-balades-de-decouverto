@@ -11,7 +11,7 @@ import { unzip } from 'react-native-zip-archive';
 
 import SplashScreen from 'react-native-splash-screen';
 
-const rootURL = 'https://decouverto.github.io/walks/';
+const rootURL = 'https://decouverto.fr/walks/';
 const rootDirectory = fs.ExternalDirectoryPath + '/';
 
 export default class HomeScreen extends React.Component {
@@ -267,7 +267,7 @@ export default class HomeScreen extends React.Component {
     }
 
     render() {
-        if (this.state.walks != null && this.state.walks.length > 1) {
+        if (this.state.walks != null) {
             var sectors = [];
             var themes = [];
             this.state.walks.forEach((data) => {
@@ -317,7 +317,7 @@ export default class HomeScreen extends React.Component {
                                 </Item>
                             </Form>
                         ) : null}
-                        {(this.state.walks != null && this.state.walks.length > 1 && !this.state.searching) ? (
+                        {(this.state.walks != null && !this.state.searching) ? (
                             <View>
                                 <Form>
                                     <Text>Secteur</Text>

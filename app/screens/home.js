@@ -358,17 +358,17 @@ export default class HomeScreen extends React.Component {
                                 let downloaded = this.isDownloaded(data.id);
                                 return (
                                     <ListItem>
-                                        <Card red-border={downloaded} book-background={data.fromBook} >
+                                        <Card red-border={downloaded} book-background={(data.fromBook === 'true')} >
                                             <CardItem header>
                                                 <Left>
                                                     <Body>
                                                         <H3>{data.title}</H3>
                                                         <Text note>{(data.distance / 1000).toFixed(1)}km</Text>
-                                                        {(data.fromBook) ? (
+                                                        {(data.fromBook === 'true') ? (
                                                             <Text note>Tracé uniquement</Text>
                                                         ) : (
-                                                                <Text note>Balade commentée</Text>
-                                                            )}
+                                                            <Text note>Balade commentée</Text>
+                                                        )}
                                                     </Body>
                                                 </Left>
                                             </CardItem>
@@ -384,12 +384,12 @@ export default class HomeScreen extends React.Component {
                                                     </Button>
                                                 </CardItem>
                                             ) : (
-                                                    <CardItem footer>
-                                                        <Button light onPress={() => this.downloadWalk(data)}>
-                                                            <Text>Télécharger</Text>
-                                                        </Button>
-                                                    </CardItem>
-                                                )}
+                                                <CardItem footer>
+                                                    <Button light onPress={() => this.downloadWalk(data)}>
+                                                        <Text>Télécharger</Text>
+                                                    </Button>
+                                                </CardItem>
+                                            )}
                                         </Card>
                                     </ListItem>
                                 );

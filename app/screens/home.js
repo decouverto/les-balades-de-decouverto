@@ -345,7 +345,7 @@ export default class HomeScreen extends React.Component {
                                         onValueChange={this.onTypeChange.bind(this)}
                                     >
                                         <Picker.Item label={'Tous'} key={'all-picker-type'} value={'all'} />
-                                        <Picker.Item label={'Tracet uniquement'} key={'book-picker-type'} value={true} />
+                                        <Picker.Item label={'Tracé uniquement'} key={'book-picker-type'} value={true} />
                                         <Picker.Item label={'Balade commentée'} key={'other-picker-type'} value={false} />
                                     </Picker>
                                 </Form>
@@ -365,7 +365,7 @@ export default class HomeScreen extends React.Component {
                                                         <H3>{data.title}</H3>
                                                         <Text note>{(data.distance / 1000).toFixed(1)}km</Text>
                                                         {(data.fromBook) ? (
-                                                            <Text note>Tracet uniquement</Text>
+                                                            <Text note>Tracé uniquement</Text>
                                                         ) : (
                                                                 <Text note>Balade commentée</Text>
                                                             )}

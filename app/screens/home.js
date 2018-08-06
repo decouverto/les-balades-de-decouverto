@@ -345,8 +345,8 @@ export default class HomeScreen extends React.Component {
                                         onValueChange={this.onTypeChange.bind(this)}
                                     >
                                         <Picker.Item label={'Tous'} key={'all-picker-type'} value={'all'} />
-                                        <Picker.Item label={'Tracé uniquement'} key={'book-picker-type'} value={true} />
-                                        <Picker.Item label={'Balade commentée'} key={'other-picker-type'} value={false} />
+                                        <Picker.Item label={'Tracé uniquement'} key={'book-picker-type'} value={'true'} />
+                                        <Picker.Item label={'Balade commentée'} key={'other-picker-type'} value={'false'} />
                                     </Picker>
                                 </Form>
                             </View>

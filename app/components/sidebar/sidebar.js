@@ -40,7 +40,7 @@ export default class SideBar extends React.Component {
                     <ListItem
                         button
                         onPress={() => {
-                                this.props.navigation.navigate('Home', {selectedType: true});
+                                this.props.navigation.navigate('Home', {selectedType: 'true'});
                         }}>
                         <Icon name='ios-book' /><Text> Balades des livres</Text>
                     </ListItem>

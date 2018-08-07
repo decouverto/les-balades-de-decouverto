@@ -13,7 +13,8 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "test": "jest",
-    "log": "react-native log-android"
+    "log": "react-native log-android",
+    "build": "cd android && ./gradlew assembleRelease"
   },
   "jest": {
     "preset": "react-native"
@@ -35,7 +36,7 @@
     "react-native-push-notification": "^3.0.2",
     "react-native-responsive-image": "^2.3.1",
     "react-native-splash-screen": "^3.0.6",
-    "react-native-track-player": "^0.2.3",
+    "react-native-track-player": "^0.2.4",
     "react-native-zip-archive": "^2.2.3",
     "react-navigation": "^1.5.12"
   }

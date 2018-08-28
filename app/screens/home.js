@@ -27,6 +27,7 @@ export default class HomeScreen extends React.Component {
 
     componentDidMount() {
         this._mounted = true;
+        //AsyncStorage.multiSet([['walks', JSON.stringify([])], ['downloadedWalks', JSON.stringify([])]]);
         AsyncStorage.multiGet(['walks', 'downloadedWalks'], (err, values) => {
             if (values !== null && !err) {
                 var obj = {};
@@ -132,7 +133,12 @@ export default class HomeScreen extends React.Component {
                 }
             }).promise.then((result) => {
                 DialogProgress.hide();
-                let size = Math.floor(result.bytesWritten * 1e-6);
+                let size = result.bytesWritten;
+                if (Math.floor(size * 1e-6) == 0) {
+                    size = Math.floor(size * 1e-3) + ' ko';
+                } else {
+                    size = Math.floor(size * 1e-6) + ' Mo';
+                }
                 unzip(rootDirectory + data.id + '/tmp.zip', rootDirectory + data.id)
                     .then(() => {
                         fs.unlink(rootDirectory + data.id + '/tmp.zip')
@@ -143,7 +149,7 @@ export default class HomeScreen extends React.Component {
                                 this.openWalk(data);
                                 Alert.alert(
                                     'Succès',
-                                    'Téléchargement et décompression réussite\n' + size + ' Mo téléchargés',
+                                    'Téléchargement et décompression réussite\n' + size + ' téléchargés',
                                     [
                                         { text: 'Ok' },
                                     ],

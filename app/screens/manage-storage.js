@@ -7,6 +7,8 @@ import material from '../../native-base-theme/variables/material';
 
 import fs from 'react-native-fs';
 
+import { parallel, every } from 'async';
+
 const rootDirectory = fs.ExternalDirectoryPath + '/';
 
 export default class ManageStorage extends React.Component {
@@ -16,7 +18,7 @@ export default class ManageStorage extends React.Component {
         this.state = { walks: [], downloadedWalks: [], wlkToDisplay: [] };
     }
 
-    componentDidMount() {
+    componentWillMount() {
         AsyncStorage.multiGet(['walks', 'downloadedWalks'], (err, values) => {
             if (values !== null && !err) {
                 var obj = {};
@@ -56,54 +58,47 @@ export default class ManageStorage extends React.Component {
         })
     }
 
-    removeWalk(id) {
+    removeWalk(data) {
         Alert.alert(
             'Attention',
-            'Êtes-vous sûr de vouloir supprimer la promenade de votre téléphone ?',
+            'Êtes-vous sûr de vouloir supprimer la promenade ' + data.title +  ' de votre téléphone ?',
             [
                 { text: 'Annuler' },
                 {
                     text: 'OK', onPress: () => {
-                        fs.unlink(rootDirectory + id)
+                        let walks = this.state.walks;
+                        for (let i = walks.length; i--;) {
+                            if (walks[i].id === data.id) {
+                                walks.splice(i, 1);
+                                break;
+                            }
+                        }
+                        let downloadedWalks = this.state.downloadedWalks;
+                        downloadedWalks.splice(data.id, 1);
+                        this.setState({walks: walks, downloadedWalks: downloadedWalks}, () => {
+                            this.calculateWlkToDisplay();
+                            AsyncStorage.setItem('downloadedWalks', JSON.stringify(this.state.downloadedWalks));
+                        });
+                        fs.unlink(rootDirectory + data.id)
                             .then(() => {
-                                AsyncStorage.getItem('downloadedWalks', (err, value) => {
-                                    if (value !== null && !err) {
-                                        let list = JSON.parse(value);
-                                        list.splice(id, 1);
-                                        AsyncStorage.setItem('downloadedWalks', JSON.stringify(list));
-                                        this.setState({downloadedWalks : list}, () => {
-                                            this.calculateWlkToDisplay();
-                                        });
-                                        Alert.alert(
-                                            'Succès',
-                                            'Les fichiers ont bien été supprimées.',
-                                            [
-                                                { text: 'Ok' },
-                                            ],
-                                            { cancelable: false }
-                                        );
-                                    }
-                                });
+                                Alert.alert(
+                                    'Succès',
+                                    'Les fichiers ont bien été supprimées.',
+                                    [
+                                        { text: 'Ok' },
+                                    ],
+                                    { cancelable: false }
+                                );
                             })
                             .catch(() => {
-                                AsyncStorage.getItem('downloadedWalks', (err, value) => {
-                                    if (value !== null && !err) {
-                                        let list = JSON.parse(value);
-                                        list.splice(id, 1);
-                                        AsyncStorage.setItem('downloadedWalks', JSON.stringify(list));
-                                        this.setState({downloadedWalks : list}, () => {
-                                            this.calculateWlkToDisplay();
-                                        });
-                                        Alert.alert(
-                                            'Erreur',
-                                            'Fichiers déja supprimés.',
-                                            [
-                                                { text: 'Ok' },
-                                            ],
-                                            { cancelable: false }
-                                        );
-                                    }
-                                });
+                                Alert.alert(
+                                    'Erreur',
+                                    'Fichiers déja supprimés.',
+                                    [
+                                        { text: 'Ok' },
+                                    ],
+                                    { cancelable: false }
+                                );
                             });
                     }
                 },
@@ -113,13 +108,42 @@ export default class ManageStorage extends React.Component {
     }
 
     calculateWlkToDisplay() {
-        var arr = [];
+        var func = [];
         this.state.walks.forEach((d) => {
             if (this.isDownloaded(d.id)) {
-                arr.push(d);
+                func.push(callback => {
+                    fs.readDir(rootDirectory + d.id).then(r => {
+                        let size = 0;
+                        every([rootDirectory + d.id + '/images', rootDirectory + d.id + '/sounds'], (filePath, cb) => {
+                            fs.readDir(filePath).then(t => {
+                                r.push(...t);
+                                cb(null, true);
+                            }).catch(() => {
+                                cb(null, true);
+                            });
+                        }, () => {
+                            r.forEach(k => {
+                                size += k.size;
+                            });
+                            if (Math.floor(size * 1e-6) == 0) {
+                                size = Math.floor(size * 1e-3) + ' ko';
+                            } else {
+                                size = Math.floor(size * 1e-6) + ' Mo';
+                            }
+                            d.size = size;
+                            callback(null, d);
+                        });
+
+                    }).catch(() => {
+                        d.size = false;
+                        callback(null, d);
+                    });
+                });
             }
         });
-        this.setState({ wlkToDisplay: arr });
+        parallel(func, (err, arr) => {
+            this.setState({ wlkToDisplay: arr });
+        });
     }
 
     render() {
@@ -147,11 +171,14 @@ export default class ManageStorage extends React.Component {
                             renderRow={data => {
                                 return (
                                     <ListItem>
-                                        <Left>
+                                        <Body>
                                             <Text onPress={() => this.openWalk(data)}>{data.title}</Text>
-                                        </Left>
+                                            {(data.size) ? (
+                                                <Text note>{data.size}</Text>
+                                            ) : null}
+                                        </Body>
                                         <Right>
-                                            <Icon name='ios-trash' onPress={() => this.removeWalk(data.id)} />
+                                            <Icon name='ios-trash' onPress={() => this.removeWalk(data)} />
                                         </Right>
                                     </ListItem>
                                 );
@@ -161,9 +188,9 @@ export default class ManageStorage extends React.Component {
                             <Card>
                                 <CardItem>
                                     <Body>
-                                        <Text style={{marginBottom: 20}}>Aucune balade téléchargée.</Text>
+                                        <Text style={{ marginBottom: 20 }}>Aucune balade téléchargée.</Text>
                                         <Button onPress={() => this.props.navigation.navigate('Home')}>
-                                        <Text> Télécharger des balades</Text>
+                                            <Text> Télécharger des balades</Text>
                                         </Button>
                                     </Body>
                                 </CardItem>

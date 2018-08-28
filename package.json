@@ -20,6 +20,7 @@
     "preset": "react-native"
   },
   "dependencies": {
+    "async": "^2.6.1",
     "distance-between-points": "0.0.0",
     "get-extremums": "0.0.0",
     "mobx": "^4.2.1",

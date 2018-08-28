@@ -195,7 +195,7 @@ export default class MapScreen extends React.Component {
                         }}
                         style={styles.map}
                         showsCompass={true}
-                        minZoomLevel={14}
+                        minZoomLevel={12}
                         showsMyLocationButton={true}
                         showsUserLocation={true}
                         mapType={'terrain'}

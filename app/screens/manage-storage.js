@@ -61,7 +61,7 @@ export default class ManageStorage extends React.Component {
     removeWalk(data) {
         Alert.alert(
             'Attention',
-            'Êtes-vous sûr de vouloir supprimer la promenade ' + data.title +  ' de votre téléphone ?',
+            'Êtes-vous sûr de vouloir supprimer la promenade ' + data.title + ' de votre téléphone ?',
             [
                 { text: 'Annuler' },
                 {
@@ -74,8 +74,11 @@ export default class ManageStorage extends React.Component {
                             }
                         }
                         let downloadedWalks = this.state.downloadedWalks;
-                        downloadedWalks.splice(data.id, 1);
-                        this.setState({walks: walks, downloadedWalks: downloadedWalks}, () => {
+                        let k = downloadedWalks.indexOf(data.id);
+                        if (k > -1) {
+                            downloadedWalks.splice(k, 1);
+                        }
+                        this.setState({ walks: walks, downloadedWalks: downloadedWalks }, () => {
                             this.calculateWlkToDisplay();
                             AsyncStorage.setItem('downloadedWalks', JSON.stringify(this.state.downloadedWalks));
                         });
@@ -100,6 +103,57 @@ export default class ManageStorage extends React.Component {
                                     { cancelable: false }
                                 );
                             });
+                    }
+                },
+            ],
+            { cancelable: false }
+        )
+    }
+
+    removeAllWalks(data) {
+        Alert.alert(
+            'Attention',
+            'Êtes-vous sûr de vouloir supprimer toutes les balades de votre téléphone ?',
+            [
+                { text: 'Annuler' },
+                {
+                    text: 'OK', onPress: () => {
+                        let notDeleted = [];
+                        every(this.state.downloadedWalks, (file, cb) => {
+                            fs.unlink(rootDirectory + file).then(() => {
+                                cb(null, true);
+                            }).catch(err => {
+                                notDeleted.push(file)
+                                cb(err);
+                            });
+                        }, err => {
+                            if (err) {
+                                this.setState({ downloadedWalks: notDeleted }, () => {
+                                    this.calculateWlkToDisplay();
+                                    AsyncStorage.setItem('downloadedWalks', JSON.parse(notDeleted));
+                                });
+                                Alert.alert(
+                                    'Erreur',
+                                    'Certains fichiers n\'ont pas été supprimées.',
+                                    [
+                                        { text: 'Ok' },
+                                    ],
+                                    { cancelable: false }
+                                );
+                            } else {
+                                this.setState({ walks: [], downloadedWalks: [], wlkToDisplay: [] }, () => {
+                                    AsyncStorage.setItem('downloadedWalks', '[]');
+                                });
+                                Alert.alert(
+                                    'Succès',
+                                    'Les fichiers ont bien été supprimées.',
+                                    [
+                                        { text: 'Ok' },
+                                    ],
+                                    { cancelable: false }
+                                );
+                            }
+                        });
                     }
                 },
             ],
@@ -133,7 +187,6 @@ export default class ManageStorage extends React.Component {
                             d.size = size;
                             callback(null, d);
                         });
-
                     }).catch(() => {
                         d.size = false;
                         callback(null, d);
@@ -184,6 +237,7 @@ export default class ManageStorage extends React.Component {
                                 );
                             }}
                         />
+
                         {(this.state.wlkToDisplay.length == 0) ? (
                             <Card>
                                 <CardItem>
@@ -195,7 +249,15 @@ export default class ManageStorage extends React.Component {
                                     </Body>
                                 </CardItem>
                             </Card>
-                        ) : null}
+                        ) : (
+                                <ListItem>
+                                    <Body>
+                                        <Button onPress={() => this.removeAllWalks()}>
+                                            <Text>Supprimer toutes les balades</Text>
+                                        </Button>
+                                    </Body>
+                                </ListItem>
+                            )}
                     </Content>
                 </Container>
             </StyleProvider>

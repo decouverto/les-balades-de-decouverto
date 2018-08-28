@@ -1,6 +1,6 @@
 {
   "name": "les-balades-de-decouverto",
-  "version": "0.1.0",
+  "version": "1.0.2",
   "private": true,
   "devDependencies": {
     "babel-preset-react-native-stage-0": "^1.0.1",

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, Linking, StatusBar, AsyncStorage, Alert, View, StyleSheet } from 'react-native';
+import { Platform, Linking, AsyncStorage, Alert, View } from 'react-native';
 import { Container, Header, Picker, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, List, ListItem, Form, Item, Input } from 'native-base';
 
 import getTheme from '../../native-base-theme/components';

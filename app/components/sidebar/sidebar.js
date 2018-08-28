@@ -3,6 +3,8 @@ import { AppRegistry, Image, StatusBar, Alert, Share, Linking } from 'react-nati
 import { Container, Content, Text, List, ListItem, View, Icon } from 'native-base';
 const routes = [{
     way: 'Home', text: 'Accueil', icon: 'ios-home'
+}, {
+    way: 'ManageStorage', text: 'Gérer l\'espace', icon: 'ios-folder'
 }];
 export default class SideBar extends React.Component {
     render() {

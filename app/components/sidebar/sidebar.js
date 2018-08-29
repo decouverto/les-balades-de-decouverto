@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppRegistry, Image, StatusBar, Alert, Share, Linking } from 'react-native';
+import { Image, Alert, Share, Linking } from 'react-native';
 import { Container, Content, Text, List, ListItem, View, Icon } from 'native-base';
 const routes = [{
     way: 'Home', text: 'Accueil', icon: 'ios-home'

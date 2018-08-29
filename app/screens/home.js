@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, Linking, AsyncStorage, Alert, View } from 'react-native';
+import { Platform, Linking, AsyncStorage, Alert, View, Share } from 'react-native';
 import { Container, Header, Picker, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, List, ListItem, Form, Item, Input } from 'native-base';
 
 import getTheme from '../../native-base-theme/components';
@@ -39,7 +39,7 @@ export default class HomeScreen extends React.Component {
                 this.setState(obj, () => {
                     if (Platform.OS === 'android') {
                         Linking.getInitialURL().then(url => {
-                          this.openDeepLink(url);
+                            this.openDeepLink(url);
                         });
                     } else {
                         Linking.addEventListener('url', function (event) {
@@ -60,7 +60,7 @@ export default class HomeScreen extends React.Component {
                             if (this.state.wlkToDisplay.legnth == 0) {
                                 if (Platform.OS === 'android') {
                                     Linking.getInitialURL().then(url => {
-                                    this.openDeepLink(url);
+                                        this.openDeepLink(url);
                                     });
                                 } else {
                                     Linking.addEventListener('url', function (event) {
@@ -215,9 +215,17 @@ export default class HomeScreen extends React.Component {
         })
     }
 
+    shareWalk(data) {
+        Share.share(
+            {
+                message: `${data.title}\n${data.description} Elle fait ${(data.distance / 1000).toFixed(1)}km.\nhttps://decouverto.fr/rando/${data.id}`
+            }
+        );
+    }
+
     calculateWlkToDisplay(id) {
         if (id) {
-            var found = this.state.walks.find(function(element) {
+            var found = this.state.walks.find(function (element) {
                 return element.id === id;
             });
             if (found) {
@@ -383,19 +391,20 @@ export default class HomeScreen extends React.Component {
                                                     <Text italic={data.fromBook}>{data.description}</Text>
                                                 </Body>
                                             </CardItem>
-                                            {(downloaded) ? (
-                                                <CardItem footer>
+                                            <CardItem footer>
+                                                {(downloaded) ? (
                                                     <Button light onPress={() => this.openWalk(data)}>
                                                         <Text>Ouvrir</Text>
                                                     </Button>
-                                                </CardItem>
-                                            ) : (
-                                                <CardItem footer>
+                                                ) : (
                                                     <Button light onPress={() => this.downloadWalk(data)}>
                                                         <Text>Télécharger</Text>
                                                     </Button>
-                                                </CardItem>
-                                            )}
+                                                )}
+                                                <Right>
+                                                    <Icon name='share' style={{ alignSelf: 'flex-end', color: '#a7a7a7' }} onPress={() => this.shareWalk(data)} />
+                                                </Right>
+                                            </CardItem>
                                         </Card>
                                     </ListItem>
                                 );

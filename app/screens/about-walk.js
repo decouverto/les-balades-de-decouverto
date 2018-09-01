@@ -42,7 +42,6 @@ export default class AboutWalkScreen extends React.Component {
                                         if (k > -1) {
                                             list.splice(k, 1);
                                         }
-                                        list.splice(id, 1);
                                         AsyncStorage.setItem('downloadedWalks', JSON.stringify(list));
                                         this.props.navigation.navigate('Home');
                                         Alert.alert(

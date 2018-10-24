@@ -5,6 +5,8 @@ const routes = [{
     way: 'Home', text: 'Accueil', icon: 'ios-home'
 }, {
     way: 'ManageStorage', text: 'Gérer l\'espace', icon: 'ios-folder'
+}, {
+    way: 'Shops', text: 'Points de vente', icon: 'ios-cart'
 }];
 export default class SideBar extends React.Component {
     render() {

@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
+import React from 'react';
 import HomeScreen from './app/screens/home.js';
+import ShopsScreen from './app/screens/shops.js';
 import AboutWalkScreen from './app/screens/about-walk.js';
 import AboutMarkerScreen from './app/screens/about-marker.js';
 import ManageStorageScreen from './app/screens/manage-storage.js';
@@ -10,6 +11,7 @@ import { Root } from 'native-base';
 const AppNavigator = DrawerNavigator(
   {
     Home: { screen: HomeScreen },
+    Shops: { screen: ShopsScreen },
     AboutWalk: { screen: AboutWalkScreen },
     AboutMarker: { screen: AboutMarkerScreen },
     ManageStorage: { screen: ManageStorageScreen },

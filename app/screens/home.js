@@ -53,9 +53,14 @@ export default class HomeScreen extends React.Component {
                 .then((response) => response.json())
                 .then((responseJson) => {
                     if (this._mounted) {
+                        let sorted = responseJson.sort(function(a, b){
+                            if(a.title < b.title) { return -1; }
+                            if(a.title > b.title) { return 1; }
+                            return 0;
+                        });
                         this.setState({
                             errLoading: false,
-                            walks: responseJson
+                            walks: sorted
                         }, () => {
                             if (this.state.wlkToDisplay.legnth == 0) {
                                 if (Platform.OS === 'android') {
@@ -71,7 +76,7 @@ export default class HomeScreen extends React.Component {
                             this.calculateWlkToDisplay();
                         });
                     }
-                    AsyncStorage.setItem('walks', JSON.stringify(responseJson));
+                    AsyncStorage.setItem('walks', JSON.stringify(sorted));
                 })
                 .catch(() => {
                     this.setState({

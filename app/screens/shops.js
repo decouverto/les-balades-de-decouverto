@@ -81,6 +81,7 @@ export default class ShopsScreen extends React.Component {
                     </Header>
                     <Content padder>
                         <H1>Liste des points de vente</H1>
+                        <Text>Vous pouvez vous procurer les livres de l'association dans les magasins suivant:</Text>
                         <List
                             dataArray={this.state.shops}
                             renderRow={data => {

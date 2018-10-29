@@ -21,6 +21,7 @@ export default class HomeScreen extends React.Component {
         let state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: false }
         if (this.props.navigation.state.params && this.props.navigation.state.params.hasOwnProperty('selectedType')) {
             state.selectedType = this.props.navigation.state.params.selectedType;
+            this.props.navigation.setParams({selectedType: 'all'});
         }
         this.state = state;
     }

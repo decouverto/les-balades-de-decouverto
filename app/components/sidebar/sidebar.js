@@ -2,8 +2,6 @@ import React from 'react';
 import { Image, Alert, Share, Linking } from 'react-native';
 import { Container, Content, Text, List, ListItem, View, Icon } from 'native-base';
 const routes = [{
-    way: 'Home', text: 'Accueil', icon: 'ios-home'
-}, {
     way: 'ManageStorage', text: 'Gérer l\'espace', icon: 'ios-folder'
 }, {
     way: 'Shops', text: 'Points de vente', icon: 'ios-cart'
@@ -28,6 +26,13 @@ export default class SideBar extends React.Component {
                             }}>
                         </Image>
                     </View>
+                    <ListItem
+                        button
+                        onPress={() => {
+                                this.props.navigation.navigate('Home', {selectedType: 'all'});
+                        }}>
+                        <Icon name='ios-home' /><Text> Accueil</Text>
+                    </ListItem>
                     <List
                         dataArray={routes}
                         renderRow={data => {

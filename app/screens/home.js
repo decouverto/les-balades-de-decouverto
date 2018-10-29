@@ -297,6 +297,16 @@ export default class HomeScreen extends React.Component {
                     themes.push(data.theme);
                 }
             });
+            sectors.sort(function(a, b){
+                if(a < b) { return -1; }
+                if(a > b) { return 1; }
+                return 0;
+            });
+            themes.sort(function(a, b){
+                if(a < b) { return -1; }
+                if(a > b) { return 1; }
+                return 0;
+            });
             var sectorsDiv = sectors.map((value, i) => {
                 return <Picker.Item label={value} key={i + '-zone'} value={value} />
             });

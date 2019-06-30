@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { AppState, StatusBar, Dimensions } from 'react-native';
+import { Dimensions } from 'react-native';
 
 import { observer } from 'mobx-react';
 
@@ -29,7 +29,7 @@ import fs from 'react-native-fs';
 
 const rootDirectory = fs.ExternalDirectoryPath + '/';
 
-@observer
+//@observer
 export default class AboutMarker extends Component {
     constructor(props) {
         super(props);

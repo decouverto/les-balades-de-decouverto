@@ -1,5 +1,4 @@
 apply plugin: "com.android.application"
-apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
 import com.android.build.OutputFile
 
@@ -78,6 +77,7 @@ project.ext.react = [
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -95,17 +95,21 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    compileSdkVersion 28
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
         applicationId "com.lesbaladesdedecouverto"
-        minSdkVersion 16
-        targetSdkVersion 23
-        versionCode 6
-        versionName "1.0.5"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 7
+        versionName "1.0.6"
         ndk {
-            abiFilters "armeabi-v7a", "x86"
+            abiFilters "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
     }
     splits {
@@ -113,24 +117,22 @@ android {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
             universalApk false  // If true, also generate a universal APK
-            include "armeabi-v7a", "x86"
+            include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
     }
     signingConfigs {
         release {
-            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
                 storeFile file(MYAPP_RELEASE_STORE_FILE)
                 storePassword MYAPP_RELEASE_STORE_PASSWORD
                 keyAlias MYAPP_RELEASE_KEY_ALIAS
                 keyPassword MYAPP_RELEASE_KEY_PASSWORD
-            }
         }
     }
     buildTypes {
         release {
             minifyEnabled enableProguardInReleaseBuilds
-            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
         }
     }
     // applicationVariants are e.g. debug, release
@@ -138,7 +140,7 @@ android {
         variant.outputs.each { output ->
             // For each separate APK per architecture, set a unique version code as described here:
             // http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
-            def versionCodes = ["armeabi-v7a":1, "x86":2]
+            def versionCodes = ["armeabi-v7a":1, "x86":2, "arm64-v8a": 3, "x86_64": 4]
             def abi = output.getFilter(OutputFile.ABI)
             if (abi != null) {  // null for the universal-debug, universal-release variants
                 output.versionCodeOverride =
@@ -149,26 +151,28 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-track-player')
-    compile project(':react-native-android-location-services-dialog-box')
-    compile project(':react-native-keep-awake')
-    compile project(':react-native-mauron85-background-geolocation')
-    compile(project(':react-native-maps')) {
+    implementation project(':@react-native-community_async-storage')
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    implementation project(':react-native-track-player')
+    implementation project(':react-native-android-location-services-dialog-box')
+    implementation project(':react-native-keep-awake')
+    implementation project(':@mauron85_react-native-background-geolocation')
+    implementation(project(':react-native-maps')) {
         exclude group: 'com.google.android.gms', module: 'play-services-base'
         exclude group: 'com.google.android.gms', module: 'play-services-maps'
     }
-    compile 'com.google.android.gms:play-services-base:11.+'
-    compile 'com.google.android.gms:play-services-maps:11.+'
-    compile 'com.google.android.gms:play-services-location:+'
-    compile project(':react-native-splash-screen')
-    compile project(':react-native-zip-archive')
-    compile project(':react-native-dialog-progress')
-    compile fileTree(dir: "libs", include: ["*.jar"])
-    compile "com.android.support:appcompat-v7:23.0.1"
-    compile project(':react-native-fs')
-    compile project(':react-native-push-notification')
-    compile 'com.google.android.gms:play-services-base:11.0.4'
-    compile "com.facebook.react:react-native:+"  // From node_modules
+    implementation 'com.google.android.gms:play-services-base:16.0.0'
+    implementation 'com.google.android.gms:play-services-maps:16.0.0'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
+    implementation project(':react-native-splash-screen')
+    implementation project(':react-native-zip-archive')
+    implementation project(':react-native-dialog-progress')
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation project(':react-native-fs')
+    implementation project(':react-native-push-notification')
+    implementation project(':react-native-vector-icons')
+    implementation "com.facebook.react:react-native:+" 
 }
 
 // Run this once to be able to run the application with BUCK

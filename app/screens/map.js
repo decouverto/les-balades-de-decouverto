@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatusBar, Alert, Linking, AsyncStorage, Dimensions, StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Container, Header, Title, Left, Icon, Right, Body, Content, Text, StyleProvider, Button, ActionSheet } from 'native-base';
 
 import { observer } from 'mobx-react';
@@ -12,7 +12,7 @@ import fs from 'react-native-fs';
 const rootDirectory = fs.ExternalDirectoryPath + '/';
 
 import MapView, { Polyline, Marker } from 'react-native-maps';
-import BackgroundGeolocation from 'react-native-mauron85-background-geolocation';
+import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import KeepAwake from 'react-native-keep-awake';
 
@@ -26,7 +26,7 @@ import getExtremums from 'get-extremums';
 
 let currentNotification = false;
 
-@observer
+//@observer
 export default class MapScreen extends React.Component {
 
     constructor(props) {

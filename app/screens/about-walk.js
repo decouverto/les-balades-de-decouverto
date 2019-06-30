@@ -1,5 +1,6 @@
 import React from 'react';
-import { StatusBar, Alert, Linking, AsyncStorage } from 'react-native';
+import { StatusBar, Alert, Linking } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import { Container, Header, Title, Left, Icon, Right, Body, Content, H1, Text, StyleProvider, Footer, FooterTab, Button } from 'native-base';
 
 import getTheme from '../../native-base-theme/components';

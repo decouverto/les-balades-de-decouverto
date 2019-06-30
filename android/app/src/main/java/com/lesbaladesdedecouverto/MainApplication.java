@@ -3,7 +3,8 @@ package com.lesbaladesdedecouverto;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import guichaguri.trackplayer.TrackPlayer;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+import com.guichaguri.trackplayer.TrackPlayer;
 import com.showlocationservicesdialogbox.LocationServicesDialogBoxPackage;
 import com.corbt.keepawake.KCKeepAwakePackage;
 import com.marianhello.bgloc.react.BackgroundGeolocationPackage;
@@ -16,6 +17,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage; 
+import com.oblador.vectoricons.VectorIconsPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +36,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+          new AsyncStoragePackage(),
+          new VectorIconsPackage(),
           new TrackPlayer(),
           new ReactNativePushNotificationPackage(),
           new LocationServicesDialogBoxPackage(),

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Platform, Linking, AsyncStorage, Alert, View, Share } from 'react-native';
+import { Platform, Linking, Alert, View, Share } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import { Container, Header, Picker, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, List, ListItem, Form, Item, Input } from 'native-base';
 
 import getTheme from '../../native-base-theme/components';

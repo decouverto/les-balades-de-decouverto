@@ -29,8 +29,7 @@ import fs from 'react-native-fs';
 
 const rootDirectory = fs.ExternalDirectoryPath + '/';
 
-//@observer
-export default class AboutMarker extends Component {
+class AboutMarker extends Component {
     constructor(props) {
         super(props);
         this.state = this.props.navigation.state.params;
@@ -142,3 +141,5 @@ export default class AboutMarker extends Component {
         );
     }
 }
+
+export default observer(AboutMarker);

@@ -1,7 +1,11 @@
-import { observable } from 'mobx';
+import { decorate, observable } from 'mobx';
 
 class Player {
-  //@observable playbackState;
+  playbackState;
 }  
+
+decorate(Player, {
+  playbackState: observable,
+});
 
 export default new Player();

@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Container, Header, Title, Left, Icon, Right, Body, Content, Text, StyleProvider, Button, ActionSheet } from 'native-base';
 
-import { observer } from 'mobx-react';
+import { observer } from "mobx-react";
 
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
@@ -22,8 +22,7 @@ import getExtremums from 'get-extremums';
 
 let currentNotification = false;
 
-//@observer
-export default class MapScreen extends React.Component {
+class MapScreen extends React.Component {
 
     constructor(props) {
         super(props);
@@ -33,7 +32,7 @@ export default class MapScreen extends React.Component {
         this.prevMarker = this.prevMarker.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         LocationServicesDialogBox.checkLocationServicesIsEnabled({
             message: 'Vous devez activer la localisation pour que l\'application fonctionne.',
             ok: 'D\'accord',
@@ -86,19 +85,9 @@ export default class MapScreen extends React.Component {
                 }
             });
             BackgroundGeolocation.start();
-            TrackPlayer.setupPlayer().then(function () {
-                TrackPlayer.updateOptions({
-                    stopWithApp: true,
-                    capabilities: [
-                        TrackPlayer.CAPABILITY_PLAY,
-                        TrackPlayer.CAPABILITY_PAUSE
-                    ]
-                });
-            });
         }).catch((error) => {
             this.props.navigation.navigate('AboutWalk', this.state);
         });
-
     }
 
     componentWillUnmount() {
@@ -239,6 +228,8 @@ export default class MapScreen extends React.Component {
     }
 }
 
+export default observer(MapScreen);
+
 const styles = StyleSheet.create({
     main_container: {
         position: 'absolute',
@@ -299,3 +290,4 @@ const styles = StyleSheet.create({
         zIndex: 10
     }
 });
+

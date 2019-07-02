@@ -20,7 +20,17 @@ Below you'll find information about performing common tasks. The most recent ver
 * [Writing and Running Tests](#writing-and-running-tests)
 * [Troubleshooting](#troubleshooting)
   * [iOS Simulator won't open](#ios-simulator-wont-open)
-  
+
+## AndroidX
+
+Add thoses lines to **gradle.properties**:
+```properties
+android.useAndroidX=true
+android.enableJetifier=true
+```
+
+Execute `./androidx.sh` to convert all components
+
 ## Google Maps
 
 Before compaling you will have to get a [Google Maps API key](https://developers.google.com/maps/android/), and write it in the `android/app/src/main/res/values/string.xml` file like this:

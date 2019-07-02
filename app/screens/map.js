@@ -7,11 +7,7 @@ import { observer } from 'mobx-react';
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
 
-import fs from 'react-native-fs';
-
-const rootDirectory = fs.ExternalDirectoryPath + '/';
-
-import MapView, { Polyline, Marker } from 'react-native-maps';
+import MapView, { Polyline, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import KeepAwake from 'react-native-keep-awake';
@@ -131,7 +127,7 @@ export default class MapScreen extends React.Component {
             }
         }
         this.refs[this.state.points[this.currentMarker].title].showCallout();
-        this.refs.mapElement.animateToCoordinate(this.state.points[this.currentMarker].coords);
+        this.refs.mapElement.animateCamera({center: this.state.points[this.currentMarker].coords});
     };
 
     prevMarker() {
@@ -148,7 +144,7 @@ export default class MapScreen extends React.Component {
             }
         }
         this.refs[this.state.points[this.currentMarker].title].showCallout();
-        this.refs.mapElement.animateToCoordinate(this.state.points[this.currentMarker].coords);
+        this.refs.mapElement.animateCamera({center: this.state.points[this.currentMarker].coords});
     }
 
     render() {
@@ -196,6 +192,7 @@ export default class MapScreen extends React.Component {
                         style={styles.map}
                         showsCompass={true}
                         minZoomLevel={12}
+                        provider={PROVIDER_GOOGLE}
                         showsMyLocationButton={true}
                         showsUserLocation={true}
                         mapType={'terrain'}
@@ -217,7 +214,7 @@ export default class MapScreen extends React.Component {
                         ))}
                     </MapView>
                     <Button style={styles.button_next} onPress={this.nextMarker}>
-                        <Icon name='ios-arrow-forward-outline' />
+                        <Icon name='ios-arrow-forward' />
                     </Button>
                     <Button style={styles.button_prev} onPress={this.prevMarker}>
                         <Icon name='ios-arrow-back' />
@@ -255,7 +252,7 @@ const styles = StyleSheet.create({
     },
     map: {
         position: 'absolute',
-        top: 0,
+        top: 50,
         left: 0,
         right: 0,
         bottom: 0,

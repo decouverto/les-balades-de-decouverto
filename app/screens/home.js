@@ -252,14 +252,21 @@ export default class HomeScreen extends React.Component {
                 err = true;
             }
             if (this.state.search != '') {
-                if (data.zone.search(this.state.search) == -1 && data.theme.search(this.state.search) == -1 && data.description.search(this.state.search) == -1 && data.title.search(this.state.search) == -1) {
+                if (data.zone.search(new RegExp(this.state.search, 'i')) == -1 && data.theme.search(new RegExp(this.state.search, 'i')) == -1 && data.description.search(new RegExp(this.state.search, 'i')) == -1 && data.title.search(new RegExp(this.state.search, 'i')) == -1) {
                     err = true;
                 }
             }
             if (!err) {
+                data.downloaded = this.isDownloaded(data.id);
                 arr.push(data);
             }
         })
+        arr.sort(function (a,b) {
+            if (a.downloaded == b.downloaded) return 0
+            if (a.downloaded && !b.downloaded) return -1
+            if (b.downloaded && !a.downloaded) return 1
+            return 0 
+        });
         this.setState({ wlkToDisplay: arr })
     }
 
@@ -386,10 +393,9 @@ export default class HomeScreen extends React.Component {
                         <List
                             dataArray={this.state.wlkToDisplay}
                             renderRow={data => {
-                                let downloaded = this.isDownloaded(data.id);
                                 return (
                                     <ListItem>
-                                        <Card red-border={downloaded} book-background={(data.fromBook == 'true')} >
+                                        <Card red-border={data.downloaded} book-background={(data.fromBook == 'true')} >
                                             <CardItem header>
                                                 <Left>
                                                     <Body>
@@ -409,7 +415,7 @@ export default class HomeScreen extends React.Component {
                                                 </Body>
                                             </CardItem>
                                             <CardItem footer>
-                                                {(downloaded) ? (
+                                                {(data.downloaded) ? (
                                                     <Button light onPress={() => this.openWalk(data)}>
                                                         <Text>Ouvrir</Text>
                                                     </Button>

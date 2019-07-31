@@ -22,7 +22,8 @@
     "test": "jest",
     "log": "react-native log-android",
     "reset": "rm -rf node_modules/ && npm i && ./androidx.sh",
-    "build": "cd android && ./gradlew assembleRelease"
+    "build": "cd android && ./gradlew bundleRelease",
+    "build-apk": "cd android && ./gradlew assembleRelease"
   },
   "jest": {
     "preset": "react-native"

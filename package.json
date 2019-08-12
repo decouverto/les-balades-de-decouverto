@@ -1,6 +1,6 @@
 {
   "name": "les-balades-de-decouverto",
-  "version": "1.0.4",
+  "version": "1.0.7",
   "private": true,
   "devDependencies": {
     "@babel/core": "^7.4.5",
@@ -18,6 +18,7 @@
   "scripts": {
     "start": "react-native start",
     "android": "react-native run-android",
+    "android-final": "react-native run-android --variant=release",
     "ios": "react-native run-ios",
     "test": "jest",
     "log": "react-native log-android",
@@ -41,7 +42,7 @@
     "react-native": "0.59.9",
     "react-native-android-location-services-dialog-box": "2.8.1",
     "react-native-dialog-progress": "^1.0.2",
-    "react-native-fs": "2.13.2",
+    "react-native-fs": "^2.14.1",
     "react-native-htmlview": "^0.13.0",
     "react-native-keep-awake": "^3.0.1",
     "react-native-maps": "^0.24.2",

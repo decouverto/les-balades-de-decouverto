@@ -12,7 +12,7 @@ import { unzip } from 'react-native-zip-archive';
 
 import SplashScreen from 'react-native-splash-screen';
 
-const rootURL = 'https://decouverto.fr/walks/';
+const rootURL = 'http://decouverto.fr/walks/';
 const rootDirectory = fs.ExternalDirectoryPath + '/';
 
 import tileList from 'osm-tile-list-json';
@@ -222,7 +222,6 @@ export default class HomeScreen extends React.Component {
                                     message: 'Veuillez patientez... ',
                                     isCancelable: false
                                 });
-                                console.log('re')
                                 this.downloadMap(data.id, (err) => {
                                     DialogProgress.hide();
                                     withmap = ' avec les cartes';
@@ -239,12 +238,8 @@ export default class HomeScreen extends React.Component {
                                 })
                             })
                             .catch(() => { this.error('Erreur lors de la suppression du fichier temporaire') })
-                            .catch(() => { this.error('Échec de la décompression') })
-                    }).catch(() => {
-                        DialogProgress.hide();
-                        this.error('Échec du téléchargement');
-                    })
-            });
+                    }).catch(() => { this.error('Échec de la décompression') })
+            }).catch(() => { this.error('Échec du téléchargement') })
         });
     }
 

@@ -15,6 +15,10 @@ import SplashScreen from 'react-native-splash-screen';
 const rootURL = 'https://decouverto.fr/walks/';
 const rootDirectory = fs.ExternalDirectoryPath + '/';
 
+import tileList from 'osm-tile-list-json';
+
+
+
 export default class HomeScreen extends React.Component {
 
     constructor(props) {
@@ -22,7 +26,7 @@ export default class HomeScreen extends React.Component {
         let state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: false }
         if (this.props.navigation.state.params && this.props.navigation.state.params.hasOwnProperty('selectedType')) {
             state.selectedType = this.props.navigation.state.params.selectedType;
-            this.props.navigation.setParams({selectedType: 'all'});
+            this.props.navigation.setParams({ selectedType: 'all' });
         }
         this.state = state;
     }
@@ -55,16 +59,16 @@ export default class HomeScreen extends React.Component {
                 .then((response) => response.json())
                 .then((responseJson) => {
                     if (this._mounted) {
-                        responseJson.sort(function(a, b){
-                            if(a.title < b.title) { return -1; }
-                            if(a.title > b.title) { return 1; }
+                        responseJson.sort(function (a, b) {
+                            if (a.title < b.title) { return -1; }
+                            if (a.title > b.title) { return 1; }
                             return 0;
                         });
                         this.setState({
                             errLoading: false,
                             walks: responseJson
                         }, () => {
-                            if (this.state.wlkToDisplay.legnth == 0) {
+                            if (this.state.wlkToDisplay.length == 0) {
                                 if (Platform.OS === 'android') {
                                     Linking.getInitialURL().then(url => {
                                         this.openDeepLink(url);
@@ -119,6 +123,66 @@ export default class HomeScreen extends React.Component {
         }).catch(cb)
     }
 
+    error(msg) {
+        Alert.alert(
+            'Erreur',
+            msg,
+            [
+                { text: 'Ok' },
+            ],
+            { cancelable: false }
+        );
+    }
+
+    // move this func
+    downloadMap (id, cb) {
+        console.error(id)
+        fs.readFile(rootDirectory + id + '/index.json').then((response) => {
+            data = JSON.parse(response);
+            tiles = tileList(data.borders, 15, 16, false, 0.1);
+            n = tiles.length;
+            // Create all promises
+            listPromise=[]
+            for (i=0; i++; i<n) {
+                a = new Promise(function(resolve, reject) {
+                    this.createDirectory(id + '/' + tiles[i].z, (err) => {
+                        console.warn(err)
+                        if (err) {
+                            reject(err)
+                        } else {
+                            this.createDirectory(id + '/' + tiles[i].z + '/' + tiles[i].x, (err) => {
+                                console.warn(err)
+                                if (err) {
+                                    reject(err)
+                                } else {
+                                    fs.downloadFile({
+                                        fromUrl: 'https://a.tile.openstreetmap.org/' + tiles[i].z + '/' + tiles[i].x + '/' + tiles[i].y + '.png', // to do add random for server URL
+                                        toFile: rootDirectory + '/' + id + '/' + tiles[i].z + '/' + tiles[i].x + '/' + tiles[i].y + '.png',
+                                    }).promise.then(()=> {
+                                        resolve()
+                                    }).catch((err)=> {
+                                        reject(err)
+                                    })
+                                }
+                            })
+                        }
+                    })
+                });
+                listPromise.push(a)
+            }
+            Promise.all(listPromise).then(() =>  {
+                cb(false)
+                
+            }, (err)=>{
+                console.error(err)
+                cb(err)
+            });
+            
+        }).catch(() => {
+            cb(true)
+        })
+    }
+
     downloadWalk(data) {
         this.createDirectory(data.id, (err) => {
             fs.downloadFile({
@@ -153,48 +217,34 @@ export default class HomeScreen extends React.Component {
                                 let list = this.state.downloadedWalks;
                                 list.push(data.id);
                                 AsyncStorage.setItem('downloadedWalks', JSON.stringify(list));
-                                this.openWalk(data);
-                                Alert.alert(
-                                    'Succès',
-                                    'Téléchargement et décompression réussite\n' + size + ' téléchargés',
-                                    [
-                                        { text: 'Ok' },
-                                    ],
-                                    { cancelable: false }
-                                );
+                                DialogProgress.show({
+                                    title: 'Téléchargement des cartes',
+                                    message: 'Veuillez patientez... ',
+                                    isCancelable: false
+                                });
+                                console.log('re')
+                                this.downloadMap(data.id, (err) => {
+                                    DialogProgress.hide();
+                                    withmap = ' avec les cartes';
+                                    if (err) withmap = '';
+                                    Alert.alert(
+                                        'Succès',
+                                        'Téléchargement et décompression réussite\n' + size + ' téléchargés' + withmap,
+                                        [
+                                            { text: 'Ok' },
+                                        ],
+                                        { cancelable: false }
+                                    );
+                                    this.openWalk(data);
+                                })
                             })
-                            .catch((e) => {
-                                Alert.alert(
-                                    'Erreur',
-                                    'Erreur lors de la suppression du fichier temporaire',
-                                    [
-                                        { text: 'Ok' },
-                                    ],
-                                    { cancelable: false }
-                                );
-                            });
+                            .catch(() => { this.error('Erreur lors de la suppression du fichier temporaire') })
+                            .catch(() => { this.error('Échec de la décompression') })
+                    }).catch(() => {
+                        DialogProgress.hide();
+                        this.error('Échec du téléchargement');
                     })
-                    .catch(() => {
-                        Alert.alert(
-                            'Erreur',
-                            'Échec de la décompression',
-                            [
-                                { text: 'Ok' },
-                            ],
-                            { cancelable: false }
-                        );
-                    })
-            }).catch(() => {
-                DialogProgress.hide();
-                Alert.alert(
-                    'Erreur',
-                    'Échec du téléchargement',
-                    [
-                        { text: 'Ok' },
-                    ],
-                    { cancelable: false }
-                );
-            })
+            });
         });
     }
 
@@ -261,11 +311,11 @@ export default class HomeScreen extends React.Component {
                 arr.push(data);
             }
         })
-        arr.sort(function (a,b) {
+        arr.sort(function (a, b) {
             if (a.downloaded == b.downloaded) return 0
             if (a.downloaded && !b.downloaded) return -1
             if (b.downloaded && !a.downloaded) return 1
-            return 0 
+            return 0
         });
         this.setState({ wlkToDisplay: arr })
     }
@@ -306,14 +356,14 @@ export default class HomeScreen extends React.Component {
                     themes.push(data.theme);
                 }
             });
-            sectors.sort(function(a, b){
-                if(a < b) { return -1; }
-                if(a > b) { return 1; }
+            sectors.sort(function (a, b) {
+                if (a < b) { return -1; }
+                if (a > b) { return 1; }
                 return 0;
             });
-            themes.sort(function(a, b){
-                if(a < b) { return -1; }
-                if(a > b) { return 1; }
+            themes.sort(function (a, b) {
+                if (a < b) { return -1; }
+                if (a > b) { return 1; }
                 return 0;
             });
             var sectorsDiv = sectors.map((value, i) => {
@@ -404,8 +454,8 @@ export default class HomeScreen extends React.Component {
                                                         {(data.fromBook == 'true') ? (
                                                             <Text note>Tracé uniquement</Text>
                                                         ) : (
-                                                            <Text note>Balade commentée</Text>
-                                                        )}
+                                                                <Text note>Balade commentée</Text>
+                                                            )}
                                                     </Body>
                                                 </Left>
                                             </CardItem>
@@ -420,10 +470,10 @@ export default class HomeScreen extends React.Component {
                                                         <Text>Ouvrir</Text>
                                                     </Button>
                                                 ) : (
-                                                    <Button light onPress={() => this.downloadWalk(data)}>
-                                                        <Text>Télécharger</Text>
-                                                    </Button>
-                                                )}
+                                                        <Button light onPress={() => this.downloadWalk(data)}>
+                                                            <Text>Télécharger</Text>
+                                                        </Button>
+                                                    )}
                                                 <Right>
                                                     <Icon name='share' style={{ alignSelf: 'flex-end', color: '#a7a7a7' }} onPress={() => this.shareWalk(data)} />
                                                 </Right>

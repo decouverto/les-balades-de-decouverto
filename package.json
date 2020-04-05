@@ -24,7 +24,8 @@
     "log": "react-native log-android",
     "reset": "rm -rf node_modules/ && npm i && ./androidx.sh",
     "build": "cd android && ./gradlew bundleRelease",
-    "build-apk": "cd android && ./gradlew assembleRelease"
+    "build-apk": "cd android && ./gradlew assembleRelease",
+    "emulator": "cd ${ANDROID_HOME}/emulator && emulator -avd nexus"
   },
   "jest": {
     "preset": "react-native"

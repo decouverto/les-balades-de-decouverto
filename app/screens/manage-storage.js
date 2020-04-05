@@ -16,7 +16,7 @@ export default class ManageStorage extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { walks: [], downloadedWalks: [], wlkToDisplay: [] };
+        this.state = { walks: [], downloadedWalks: [], wlkToDisplay: [], loading: true };
     }
 
     componentWillMount() {
@@ -162,41 +162,51 @@ export default class ManageStorage extends React.Component {
         )
     }
 
+    readSize(f, callback) {
+        fs.readDir(f).then(r => {
+            let functions = []
+            r.forEach(file=> {
+                functions.push((cb) => {
+                        if (file.isFile()) {
+                            cb(null, file.size)
+                        } else {
+                            this.readSize(file.path, cb)
+                        }
+                })
+            })
+            parallel(functions, (err, result) => {
+                if (err) callback(err)
+                const reducer = (accumulator, currentValue) => accumulator + currentValue;
+                callback(null, result.reduce(reducer, 0));
+            });
+        }).catch((err) => {
+            callback(err);
+        });
+
+    }
+
     calculateWlkToDisplay() {
         var func = [];
         this.state.walks.forEach((d) => {
             if (this.isDownloaded(d.id)) {
                 func.push(callback => {
-                    fs.readDir(rootDirectory + d.id).then(r => {
-                        let size = 0;
-                        every([rootDirectory + d.id + '/images', rootDirectory + d.id + '/sounds'], (filePath, cb) => {
-                            fs.readDir(filePath).then(t => {
-                                r.push(...t);
-                                cb(null, true);
-                            }).catch(() => {
-                                cb(null, true);
-                            });
-                        }, () => {
-                            r.forEach(k => {
-                                size += k.size;
-                            });
-                            if (Math.floor(size * 1e-6) == 0) {
-                                size = Math.floor(size * 1e-3) + ' ko';
-                            } else {
-                                size = Math.floor(size * 1e-6) + ' Mo';
-                            }
-                            d.size = size;
-                            callback(null, d);
-                        });
-                    }).catch(() => {
-                        d.size = false;
+                    this.readSize(rootDirectory + d.id, (err, size) => {
+                        if (err) {
+                            size = 0
+                        }
+                        if (Math.floor(size * 1e-6) == 0) {
+                            size = Math.floor(size * 1e-3) + ' ko';
+                        } else {
+                            size = Math.floor(size * 1e-6) + ' Mo';
+                        }
+                        d.size = size
                         callback(null, d);
                     });
                 });
             }
         });
         parallel(func, (err, arr) => {
-            this.setState({ wlkToDisplay: arr });
+            this.setState({ wlkToDisplay: arr, loading: false });
         });
     }
 
@@ -239,7 +249,15 @@ export default class ManageStorage extends React.Component {
                             }}
                         />
 
-                        {(this.state.wlkToDisplay.length == 0) ? (
+                        {(this.state.loading) ? (
+                            <Card>
+                                <CardItem>
+                                    <Body>
+                                        <Text style={{ marginBottom: 20 }}>Chargement...</Text>
+                                    </Body>
+                                </CardItem>
+                            </Card>
+                        ) : (this.state.wlkToDisplay.length == 0) ? (
                             <Card>
                                 <CardItem>
                                     <Body>

@@ -185,6 +185,7 @@ class MapScreen extends React.Component {
                         style={styles.map}
                         showsCompass={true}
                         minZoomLevel={12}
+                        maxZoomLevel={16}
                         provider={PROVIDER_GOOGLE}
                         showsMyLocationButton={true}
                         showsUserLocation={true}

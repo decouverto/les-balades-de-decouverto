@@ -124,6 +124,7 @@ export default class HomeScreen extends React.Component {
     }
 
     error(msg) {
+        DialogProgress.hide();
         Alert.alert(
             'Erreur',
             msg,
@@ -133,7 +134,7 @@ export default class HomeScreen extends React.Component {
             { cancelable: false }
         );
     }
-    
+
     downloadMap (id, progress, cb) {
         fs.readFile(rootDirectory + id + '/index.json').then((response) => {
             data = JSON.parse(response);

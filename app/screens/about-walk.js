@@ -10,6 +10,11 @@ import TrackPlayer from 'react-native-track-player';
 
 import fs from 'react-native-fs';
 
+import DialogProgress from 'react-native-dialog-progress';
+
+import tileList from 'osm-tile-list-json';
+import { each } from 'async';
+
 const rootDirectory = fs.ExternalDirectoryPath + '/';
 
 export default class AboutWalkScreen extends React.Component {
@@ -87,6 +92,98 @@ export default class AboutWalkScreen extends React.Component {
         )
     }
 
+    createDirectory(id, cb) {
+        fs.exists(rootDirectory + id).then((exists) => {
+            if (exists) return cb();
+            fs.mkdir(rootDirectory + id).then(cb).catch(cb);
+        }).catch(cb)
+    }
+
+
+    downloadMap (id, progress, cb) {
+        fs.readFile(rootDirectory + id + '/index.json').then((response) => {
+            data = JSON.parse(response);
+            tiles = tileList(data.borders, 13, 16, false, 0.01);
+            n = tiles.length;
+            c = 0;
+            size = 0;
+
+            each(tiles, (tile, callback) => {
+                this.createDirectory(id + '/' + tile.z, (err) => {
+                    if (err) {
+                        console.warn(err)
+                        callback(err)
+                    } else {
+                        this.createDirectory(id + '/' + tile.z + '/' + tile.x, (err) => {
+                            if (err) {
+                                console.warn(err)
+                                callback(err)
+                            } else {
+                                fs.downloadFile({
+                                    fromUrl: 'https://b.tile.openstreetmap.org/' + tile.z + '/' + tile.x + '/' + tile.y + '.png', // to do add random for server URL
+                                    toFile: rootDirectory + '/' + id + '/' + tile.z + '/' + tile.x + '/' + tile.y + '.png'
+                                }).promise.then((result) => {
+                                    size += result.bytesWritten;
+                                    c+=1;
+                                    progress(c/n)
+                                    callback();
+                                }).catch(callback)
+                            }
+                        });
+                    }
+                });
+            }, function() {
+                cb(null, size)
+            });
+        
+            
+        }).catch(function(err) {
+            console.warn(err)
+            cb(true)
+        })
+    }
+
+    renewMap(id) {
+        DialogProgress.show({
+            title: 'Téléchargement de la carte',
+            message: 'Veuillez patientez... ',
+            isCancelable: false
+        });
+        this.downloadMap(id, (progress) => {
+            DialogProgress.show({
+                title: 'Téléchargement de la carte',
+                message: 'Veuillez patientez... ' + Math.round(progress * 100) + '%',
+                isCancelable: false
+            });
+        }, (err, size) => {
+            DialogProgress.hide();
+            if (err) { 
+                Alert.alert(
+                    'Échec',
+                    'Échec du téléchargement de la page',
+                    [
+                        { text: 'Ok' },
+                    ],
+                    { cancelable: false }
+                );
+            } else {
+                if (Math.floor(size * 1e-6) == 0) {
+                    size = Math.floor(size * 1e-3) + ' ko';
+                } else {
+                    size = Math.floor(size * 1e-6) + ' Mo';
+                }
+                Alert.alert(
+                    'Succès',
+                    'Téléchargement de la carte réussit: \n' + size + ' téléchargés ',
+                    [
+                        { text: 'Ok' },
+                    ],
+                    { cancelable: false }
+                );
+            };
+        })
+    }
+
     render() {
         return (
             <StyleProvider style={getTheme(material)} >
@@ -112,7 +209,7 @@ export default class AboutWalkScreen extends React.Component {
                     </Header>
                     <Content padder>
                         <H1>{this.state.title}</H1>
-                        <Button onPress={() => this.openMap(this.state.points[0])} style={{ padding: 5, marginBottom: 10, marginTop: 10 }} iconRight>
+                        <Button onPress={() => this.openMap(this.state.points[0])} style={{ padding: 5, marginBottom: 10, marginTop: 10, backgroundColor: '#3498db' }} iconRight>
                             <Text>Aller au point de départ</Text>
                             <Icon name='map' />
                         </Button>
@@ -120,10 +217,14 @@ export default class AboutWalkScreen extends React.Component {
                         <Text>La marche est considérée comme un sport par conséquent assurez-vous d'avoir les conditions physiques nécessaires pour pouvoir la pratiquer.{'\n'}</Text>
                         <Text>L'association Découverto, ses auteurs et ses collaborateurs déclinent toutes responsabilités quant à l'utilisation, l'exactitude et la manipulation de l'application.{'\n'}</Text>
                         <Text>Nous vous rappelons que cette application pour smartphone peut à tout moment être victime d'une panne ou d'une déficience technique. Vous ne devez par conséquent pas avoir une foi aveugle en elle et nous vous conseillons de toujours vous munir d'une carte lorsque vous allez en forêt.</Text>
+                        <Button onPress={() => this.renewMap(this.state.id)} style={{ padding: 5, marginBottom: 10, marginTop: 10, backgroundColor: '#3498db' }} iconRight>
+                            <Text>Télécharger à nouveau la carte</Text>
+                            <Icon name='download' />
+                        </Button>
                     </Content>
                     <Footer>
                         <FooterTab>
-                            <Button full onPress={() => this.props.navigation.navigate('Map', this.state)}>
+                            <Button full style={{ backgroundColor: '#27ae60' }} onPress={() => this.props.navigation.navigate('Map', this.state)}>
                                 <Text>Démarrer la promenade</Text>
                             </Button>
                         </FooterTab>

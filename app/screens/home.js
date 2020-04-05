@@ -133,8 +133,7 @@ export default class HomeScreen extends React.Component {
             { cancelable: false }
         );
     }
-
-    // move this func
+    
     downloadMap (id, progress, cb) {
         fs.readFile(rootDirectory + id + '/index.json').then((response) => {
             data = JSON.parse(response);

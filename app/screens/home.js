@@ -135,12 +135,14 @@ export default class HomeScreen extends React.Component {
     }
 
     // move this func
-    downloadMap (id, cb) {
+    downloadMap (id, progress, cb) {
         fs.readFile(rootDirectory + id + '/index.json').then((response) => {
             data = JSON.parse(response);
             tiles = tileList(data.borders, 14, 16, false, 0.01);
             n = tiles.length;
-            
+            c = 0;
+            size = 0;
+
             each(tiles, (tile, callback) => {
                 this.createDirectory(id + '/' + tile.z, (err) => {
                     if (err) {
@@ -155,13 +157,18 @@ export default class HomeScreen extends React.Component {
                                 fs.downloadFile({
                                     fromUrl: 'https://a.tile.openstreetmap.org/' + tile.z + '/' + tile.x + '/' + tile.y + '.png', // to do add random for server URL
                                     toFile: rootDirectory + '/' + id + '/' + tile.z + '/' + tile.x + '/' + tile.y + '.png'
-                                }).promise.then(callback).catch(callback)
+                                }).promise.then((result) => {
+                                    size += result.bytesWritten;
+                                    c+=1;
+                                    progress(c/n)
+                                    callback();
+                                }).catch(callback)
                             }
                         });
                     }
                 });
             }, function() {
-                cb(null)
+                cb(null, size)
             });
         
             
@@ -193,11 +200,6 @@ export default class HomeScreen extends React.Component {
             }).promise.then((result) => {
                 DialogProgress.hide();
                 let size = result.bytesWritten;
-                if (Math.floor(size * 1e-6) == 0) {
-                    size = Math.floor(size * 1e-3) + ' ko';
-                } else {
-                    size = Math.floor(size * 1e-6) + ' Mo';
-                }
                 unzip(rootDirectory + data.id + '/tmp.zip', rootDirectory + data.id)
                     .then(() => {
                         fs.unlink(rootDirectory + data.id + '/tmp.zip')
@@ -210,18 +212,44 @@ export default class HomeScreen extends React.Component {
                                     message: 'Veuillez patientez... ',
                                     isCancelable: false
                                 });
-                                this.downloadMap(data.id, (err) => {
+                                this.downloadMap(data.id, (progress) => {
+                                    DialogProgress.show({
+                                        title: 'Téléchargement des cartes',
+                                        message: 'Veuillez patientez... ' + Math.round(progress * 100) + '%',
+                                        isCancelable: false
+                                    });
+                                }, (err, mapSize) => {
                                     DialogProgress.hide();
-                                    withmap = ' avec les cartes';
-                                    if (err) withmap = '';
-                                    Alert.alert(
-                                        'Succès',
-                                        'Téléchargement et décompression réussite\n' + size + ' téléchargés' + withmap,
-                                        [
-                                            { text: 'Ok' },
-                                        ],
-                                        { cancelable: false }
-                                    );
+                                    if (err) { 
+                                        if (Math.floor(size * 1e-6) == 0) {
+                                            size = Math.floor(size * 1e-3) + ' ko';
+                                        } else {
+                                            size = Math.floor(size * 1e-6) + ' Mo';
+                                        }
+                                        Alert.alert(
+                                            'Succès',
+                                            'Téléchargement réussit:\n' + size + ' téléchargés',
+                                            [
+                                                { text: 'Ok' },
+                                            ],
+                                            { cancelable: false }
+                                        );
+                                    } else {
+                                        size+=mapSize;
+                                        if (Math.floor(size * 1e-6) == 0) {
+                                            size = Math.floor(size * 1e-3) + ' ko';
+                                        } else {
+                                            size = Math.floor(size * 1e-6) + ' Mo';
+                                        }
+                                        Alert.alert(
+                                            'Succès',
+                                            'Téléchargement réussit: \n' + size + ' téléchargés avec les cartes',
+                                            [
+                                                { text: 'Ok' },
+                                            ],
+                                            { cancelable: false }
+                                        );
+                                    };
                                     this.openWalk(data);
                                 })
                             })

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Container, Header, Title, Left, Icon, Right, Body, Content, Text, StyleProvider, Button, ActionSheet } from 'native-base';
 
 import { observer } from "mobx-react";
@@ -7,7 +7,7 @@ import { observer } from "mobx-react";
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
 
-import MapView, { Polyline, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Polyline, Marker, PROVIDER_GOOGLE, LocalTile } from 'react-native-maps';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import KeepAwake from 'react-native-keep-awake';
@@ -22,11 +22,15 @@ import getExtremums from 'get-extremums';
 
 let currentNotification = false;
 
+import fs from 'react-native-fs';
+const rootDirectory = fs.ExternalDirectoryPath + '/';
+
 class MapScreen extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = this.props.navigation.state.params;
+        this.state.pathTemplate = rootDirectory + this.state.id + '/{z}/{x}/{y}.png'
         this.centerMap = this.centerMap.bind(this);
         this.nextMarker = this.nextMarker.bind(this);
         this.prevMarker = this.prevMarker.bind(this);
@@ -187,11 +191,8 @@ class MapScreen extends React.Component {
                         mapType={'terrain'}
                         loadingEnabled={true}
                         ref='mapElement'>
-                        <Polyline
-                            coordinates={this.state.itinerary}
-                            strokeColor='#000'
-                            strokeWidth={3}
-                        />
+                        
+                        <View>
                         {this.state.points.map(marker => (
                             <Marker
                                 onCalloutPress={() => this.props.navigation.navigate('AboutMarker', { ...marker, walk: this.state })}
@@ -200,7 +201,20 @@ class MapScreen extends React.Component {
                                 ref={marker.title}
                                 key={marker.title}
                             />
+                            
                         ))}
+                        <LocalTile
+                            pathTemplate={this.state.pathTemplate}
+                            tileSize={256}
+                            zIndex={-3}
+                            />
+                        <Polyline
+                            coordinates={this.state.itinerary}
+                            strokeColor='#000'
+                            strokeWidth={3}
+                            zIndex={-2}
+                        />
+                        </View>
                     </MapView>
                     <Button style={styles.button_next} onPress={this.nextMarker}>
                         <Icon name='ios-arrow-forward' />

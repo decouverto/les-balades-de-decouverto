@@ -16,7 +16,7 @@ const rootURL = 'http://decouverto.fr/walks/';
 const rootDirectory = fs.ExternalDirectoryPath + '/';
 
 import tileList from 'osm-tile-list-json';
-
+import { each } from 'async';
 
 
 export default class HomeScreen extends React.Component {
@@ -136,51 +136,35 @@ export default class HomeScreen extends React.Component {
 
     // move this func
     downloadMap (id, cb) {
-        console.error(id)
         fs.readFile(rootDirectory + id + '/index.json').then((response) => {
             data = JSON.parse(response);
-            tiles = tileList(data.borders, 15, 16, false, 0.1);
+            tiles = tileList(data.borders, 14, 16, false, 0.01);
             n = tiles.length;
             // Create all promises
-            listPromise=[]
-            for (i=0; i++; i<n) {
-                a = new Promise(function(resolve, reject) {
-                    this.createDirectory(id + '/' + tiles[i].z, (err) => {
-                        console.warn(err)
-                        if (err) {
-                            reject(err)
-                        } else {
-                            this.createDirectory(id + '/' + tiles[i].z + '/' + tiles[i].x, (err) => {
-                                console.warn(err)
-                                if (err) {
-                                    reject(err)
-                                } else {
-                                    fs.downloadFile({
-                                        fromUrl: 'https://a.tile.openstreetmap.org/' + tiles[i].z + '/' + tiles[i].x + '/' + tiles[i].y + '.png', // to do add random for server URL
-                                        toFile: rootDirectory + '/' + id + '/' + tiles[i].z + '/' + tiles[i].x + '/' + tiles[i].y + '.png',
-                                    }).promise.then(()=> {
-                                        resolve()
-                                    }).catch((err)=> {
-                                        reject(err)
-                                    })
-                                }
-                            })
-                        }
-                    })
-                });
-                listPromise.push(a)
-            }
-            Promise.all(listPromise).then(() =>  {
-                cb(false)
-                
-            }, (err)=>{
-                console.error(err)
-                cb(err)
-            });
             
-        }).catch(() => {
-            cb(true)
-        })
+            each(tiles, (tile, callback) => {
+                this.createDirectory(id + '/' + tile.z, (err) => {
+                    if (err) {
+                        console.warn(err)
+                        callback(err)
+                    } else {
+                        this.createDirectory(id + '/' + tile.z + '/' + tile.x, (err) => {
+                            if (err) {
+                                console.warn(err)
+                                callback(err)
+                            } else {
+                                fs.downloadFile({
+                                    fromUrl: 'https://a.tile.openstreetmap.org/' + tile.z + '/' + tile.x + '/' + tile.y + '.png', // to do add random for server URL
+                                    toFile: rootDirectory + '/' + id + '/' + tile.z + '/' + tile.x + '/' + tile.y + '.png'
+                                }).promise.then(callback).catch(callback)
+                            }
+                        });
+                    }
+                });
+            }, cb);
+        
+            
+        }).catch(cb)
     }
 
     downloadWalk(data) {
@@ -223,6 +207,7 @@ export default class HomeScreen extends React.Component {
                                     isCancelable: false
                                 });
                                 this.downloadMap(data.id, (err) => {
+                                    console.warn(err)
                                     DialogProgress.hide();
                                     withmap = ' avec les cartes';
                                     if (err) withmap = '';

@@ -140,7 +140,6 @@ export default class HomeScreen extends React.Component {
             data = JSON.parse(response);
             tiles = tileList(data.borders, 14, 16, false, 0.01);
             n = tiles.length;
-            // Create all promises
             
             each(tiles, (tile, callback) => {
                 this.createDirectory(id + '/' + tile.z, (err) => {
@@ -161,10 +160,15 @@ export default class HomeScreen extends React.Component {
                         });
                     }
                 });
-            }, cb);
+            }, function() {
+                cb(null)
+            });
         
             
-        }).catch(cb)
+        }).catch(function(err) {
+            console.warn(err)
+            cb(true)
+        })
     }
 
     downloadWalk(data) {
@@ -207,7 +211,6 @@ export default class HomeScreen extends React.Component {
                                     isCancelable: false
                                 });
                                 this.downloadMap(data.id, (err) => {
-                                    console.warn(err)
                                     DialogProgress.hide();
                                     withmap = ' avec les cartes';
                                     if (err) withmap = '';

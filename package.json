@@ -1,6 +1,6 @@
 {
   "name": "les-balades-de-decouverto",
-  "version": "1.0.8",
+  "version": "1.0.10",
   "private": true,
   "devDependencies": {
     "@babel/core": "^7.4.5",
@@ -39,7 +39,7 @@
     "mobx": "^4.2.1",
     "mobx-react": "^5.1.2",
     "native-base": "^2.12.1",
-    "osm-tile-list-json": "0.0.1",
+    "osm-tile-list-json": "0.0.2",
     "react": "16.8.3",
     "react-native": "0.59.9",
     "react-native-android-location-services-dialog-box": "2.8.1",

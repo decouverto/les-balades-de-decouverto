@@ -47,30 +47,38 @@ class AboutMarker extends Component {
 
 
     togglePlayback() {
+        let s = {
+            id: this.state.sound,
+            url: 'file://' + rootDirectory + this.state.walk.id + '/sounds/' + this.state.sound, 
+            title: this.state.title,
+            album: this.state.walk.title
+        }
         TrackPlayer.getPosition().then((position)=> {
             if (position == 0) {
-                TrackPlayer.add([{
-                    id: this.state.sound,
-                    url: 'file://' + rootDirectory + this.state.walk.id + '/sounds/' + this.state.sound, 
-                    title: this.state.title,
-                    album: this.state.walk.title
-                }])
+                TrackPlayer.add([s])
                 TrackPlayer.play();
                 this.setState({currentPlaying: true});
             } else {
                 TrackPlayer.getCurrentTrack().then((current) => {
                     if ((PlayerStore.playbackState === TrackPlayer.STATE_PAUSED || PlayerStore.playbackState === TrackPlayer.STATE_STOPPED) && current == this.state.sound) {
-                        TrackPlayer.play();
-                        this.setState({currentPlaying: true});
+                        TrackPlayer.getDuration().then((duration) => {
+                            if (Number(position).toFixed(1) == Number(duration).toFixed(1)) {
+                                this.changingTrack = true;
+                                TrackPlayer.reset();
+                                TrackPlayer.add([s])
+                                TrackPlayer.play();
+                                this.setState({currentPlaying: true});
+                                this.changingTrack = false;
+                                
+                            } else {
+                                this.setState({currentPlaying: true});
+                                TrackPlayer.play();
+                            }
+                        })                        
                     } else if (current != this.state.sound) {
                         this.changingTrack = true;
                         TrackPlayer.reset();
-                        TrackPlayer.add([{
-                            id: this.state.sound,
-                            url: 'file://' + rootDirectory + this.state.walk.id + '/sounds/' + this.state.sound, 
-                            title: this.state.title,
-                            album: this.state.walk.title
-                        }]);
+                        TrackPlayer.add([s])
                         TrackPlayer.play();
                         this.setState({currentPlaying: true});
                         this.changingTrack = false;

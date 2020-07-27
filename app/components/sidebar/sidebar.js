@@ -29,7 +29,7 @@ export default class SideBar extends React.Component {
                     <ListItem
                         button
                         onPress={() => {
-                                this.props.navigation.navigate('Home', {selectedType: 'all'});
+                                this.props.navigation.navigate('Home', {onlyBook: false});
                         }}>
                         <Icon name='ios-home' /><Text> Accueil</Text>
                     </ListItem>
@@ -49,7 +49,7 @@ export default class SideBar extends React.Component {
                     <ListItem
                         button
                         onPress={() => {
-                                this.props.navigation.navigate('Home', {selectedType: 'true'});
+                                this.props.navigation.navigate('Home', {onlyBook: true});
                         }}>
                         <Icon name='ios-book' /><Text> Balades des livres</Text>
                     </ListItem>

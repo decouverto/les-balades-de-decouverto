@@ -94,10 +94,19 @@ export default class HomeScreen extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.navigation.state.params && nextProps.navigation.state.params.hasOwnProperty('selectedType')) {
-            this.setState({
-                selectedType: nextProps.navigation.state.params.selectedType
-            }, this.calculateWlkToDisplay);
+        if (nextProps.navigation.state.params && nextProps.navigation.state.params.hasOwnProperty('onlyBook')) {
+            if (nextProps.navigation.state.params.onlyBook) {
+                this.setState({
+                    search: 'livre',
+                    searching: true
+                }, this.calculateWlkToDisplay);
+            } else {
+                this.setState({
+                    search: '',
+                    searching: false
+                }, this.calculateWlkToDisplay);
+            }
+            
         }
     }
 

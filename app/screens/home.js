@@ -23,7 +23,7 @@ export default class HomeScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        let state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: false }
+        let state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], downloading: false, selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: false }
         if (this.props.navigation.state.params && this.props.navigation.state.params.hasOwnProperty('selectedType')) {
             state.selectedType = this.props.navigation.state.params.selectedType;
             this.props.navigation.setParams({ selectedType: 'all' });
@@ -147,7 +147,13 @@ export default class HomeScreen extends React.Component {
     downloadMap (id, progress, cb) {
         fs.readFile(rootDirectory + id + '/index.json').then((response) => {
             data = JSON.parse(response);
-            tiles = tileList(data.borders, 14, 16, false, 0.01);
+
+            let maxZoomLevel = 16;
+            if (km < 5000) {
+                maxZoomLevel = 18;
+            }
+
+            tiles = tileList(data.borders, 12, maxZoomLevel, false, 0.01);
             n = tiles.length;
             c = 0;
             size = 0;
@@ -188,83 +194,99 @@ export default class HomeScreen extends React.Component {
     }
 
     downloadWalk(data) {
-        this.createDirectory(data.id, (err) => {
-            fs.downloadFile({
-                fromUrl: rootURL + data.id + '.zip',
-                toFile: rootDirectory + data.id + '/tmp.zip',
-                begin: () => {
-                    DialogProgress.show({
-                        title: 'Téléchargement',
-                        message: 'Veuillez patientez...',
-                        isCancelable: false
-                    });
-                },
-                progress: (result) => {
-                    DialogProgress.show({
-                        title: 'Téléchargement',
-                        message: 'Veuillez patientez... ' + Math.round(result.bytesWritten / result.contentLength * 100) + '%',
-                        isCancelable: false
-                    });
-                }
-            }).promise.then((result) => {
-                DialogProgress.hide();
-                let size = result.bytesWritten;
-                unzip(rootDirectory + data.id + '/tmp.zip', rootDirectory + data.id)
-                    .then(() => {
-                        fs.unlink(rootDirectory + data.id + '/tmp.zip')
-                            .then(() => {
-                                let list = this.state.downloadedWalks;
-                                list.push(data.id);
-                                AsyncStorage.setItem('downloadedWalks', JSON.stringify(list));
-                                DialogProgress.show({
-                                    title: 'Téléchargement des cartes',
-                                    message: 'Veuillez patientez... ',
-                                    isCancelable: false
-                                });
-                                this.downloadMap(data.id, (progress) => {
+        if (this.state.downloading) return true;
+        let localError = (message) => {
+            this.setState({
+                downloading: false
+            }, (message) => {
+                this.error(message);
+            });
+        }
+        this.setState({
+            downloading: true
+        }, () => {
+            this.createDirectory(data.id, (err) => {
+                fs.downloadFile({
+                    fromUrl: rootURL + data.id + '.zip',
+                    toFile: rootDirectory + data.id + '/tmp.zip',
+                    begin: () => {
+                        DialogProgress.show({
+                            title: 'Téléchargement',
+                            message: 'Veuillez patientez...',
+                            isCancelable: false
+                        });
+                    },
+                    progress: (result) => {
+                        DialogProgress.show({
+                            title: 'Téléchargement',
+                            message: 'Veuillez patientez... ' + Math.round(result.bytesWritten / result.contentLength * 100) + '%',
+                            isCancelable: false
+                        });
+                    }
+                }).promise.then((result) => {
+                    DialogProgress.hide();
+                    let size = result.bytesWritten;
+                    unzip(rootDirectory + data.id + '/tmp.zip', rootDirectory + data.id)
+                        .then(() => {
+                            fs.unlink(rootDirectory + data.id + '/tmp.zip')
+                                .then(() => {
+                                    let list = this.state.downloadedWalks;
+                                    list.push(data.id);
+                                    AsyncStorage.setItem('downloadedWalks', JSON.stringify(list));
                                     DialogProgress.show({
                                         title: 'Téléchargement des cartes',
-                                        message: 'Veuillez patientez... ' + Math.round(progress * 100) + '%',
+                                        message: 'Veuillez patientez... ',
                                         isCancelable: false
                                     });
-                                }, (err, mapSize) => {
-                                    DialogProgress.hide();
-                                    if (err) { 
-                                        if (Math.floor(size * 1e-6) == 0) {
-                                            size = Math.floor(size * 1e-3) + ' ko';
+                                    this.downloadMap(data.distance, data.id, (progress) => {
+                                        DialogProgress.show({
+                                            title: 'Téléchargement des cartes',
+                                            message: 'Veuillez patientez... ' + Math.round(progress * 100) + '%',
+                                            isCancelable: false
+                                        });
+                                    }, (err, mapSize) => {
+                                        DialogProgress.hide();
+                                        if (err) { 
+                                            if (Math.floor(size * 1e-6) == 0) {
+                                                size = Math.floor(size * 1e-3) + ' ko';
+                                            } else {
+                                                size = Math.floor(size * 1e-6) + ' Mo';
+                                            }
+                                            Alert.alert(
+                                                'Succès',
+                                                'Téléchargement réussit:\n' + size + ' téléchargés',
+                                                [
+                                                    { text: 'Ok' },
+                                                ],
+                                                { cancelable: false }
+                                            );
                                         } else {
-                                            size = Math.floor(size * 1e-6) + ' Mo';
-                                        }
-                                        Alert.alert(
-                                            'Succès',
-                                            'Téléchargement réussit:\n' + size + ' téléchargés',
-                                            [
-                                                { text: 'Ok' },
-                                            ],
-                                            { cancelable: false }
-                                        );
-                                    } else {
-                                        size+=mapSize;
-                                        if (Math.floor(size * 1e-6) == 0) {
-                                            size = Math.floor(size * 1e-3) + ' ko';
-                                        } else {
-                                            size = Math.floor(size * 1e-6) + ' Mo';
-                                        }
-                                        Alert.alert(
-                                            'Succès',
-                                            'Téléchargement réussit: \n' + size + ' téléchargés avec les cartes',
-                                            [
-                                                { text: 'Ok' },
-                                            ],
-                                            { cancelable: false }
-                                        );
-                                    };
-                                    this.openWalk(data);
+                                            size+=mapSize;
+                                            if (Math.floor(size * 1e-6) == 0) {
+                                                size = Math.floor(size * 1e-3) + ' ko';
+                                            } else {
+                                                size = Math.floor(size * 1e-6) + ' Mo';
+                                            }
+                                            Alert.alert(
+                                                'Succès',
+                                                'Téléchargement réussit: \n' + size + ' téléchargés avec les cartes',
+                                                [
+                                                    { text: 'Ok' },
+                                                ],
+                                                { cancelable: false }
+                                            );
+                                        };
+                                        this.setState({
+                                            downloading: false
+                                        }, (message) => {
+                                            this.openWalk(data);
+                                        });
+                                    })
                                 })
-                            })
-                            .catch(() => { this.error('Erreur lors de la suppression du fichier temporaire') })
-                    }).catch(() => { this.error('Échec de la décompression') })
-            }).catch(() => { this.error('Échec du téléchargement') })
+                                .catch(() => { localError('Erreur lors de la suppression du fichier temporaire') })
+                        }).catch(() => { localError('Échec de la décompression') })
+                }).catch(() => { localError('Échec du téléchargement') })
+            });
         });
     }
 

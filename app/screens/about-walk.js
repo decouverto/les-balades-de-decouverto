@@ -100,10 +100,17 @@ export default class AboutWalkScreen extends React.Component {
     }
 
 
-    downloadMap (id, progress, cb) {
+    downloadMap (km, id, progress, cb) {
         fs.readFile(rootDirectory + id + '/index.json').then((response) => {
             data = JSON.parse(response);
-            tiles = tileList(data.borders, 13, 16, false, 0.01);
+
+
+            let maxZoomLevel = 16;
+            if (km < 5000) {
+                maxZoomLevel = 18;
+            }
+
+            tiles = tileList(data.borders, 13, maxZoomLevel, false, 0.01);
             n = tiles.length;
             c = 0;
             size = 0;
@@ -149,7 +156,7 @@ export default class AboutWalkScreen extends React.Component {
             message: 'Veuillez patientez... ',
             isCancelable: false
         });
-        this.downloadMap(id, (progress) => {
+        this.downloadMap(this.state.distance, id, (progress) => {
             DialogProgress.show({
                 title: 'Téléchargement de la carte',
                 message: 'Veuillez patientez... ' + Math.round(progress * 100) + '%',

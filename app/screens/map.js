@@ -141,6 +141,10 @@ class MapScreen extends React.Component {
     }
 
     render() {
+        let maxZoomLevel = 16;
+        if (this.state.distance < 5000) {
+            maxZoomLevel = 18;
+        }
         return (
             <StyleProvider style={getTheme(material)}>
                 <Container style={styles.main_container}>
@@ -185,7 +189,7 @@ class MapScreen extends React.Component {
                         style={styles.map}
                         showsCompass={true}
                         minZoomLevel={12}
-                        maxZoomLevel={16}
+                        maxZoomLevel={maxZoomLevel}
                         provider={PROVIDER_GOOGLE}
                         showsMyLocationButton={true}
                         showsUserLocation={true}

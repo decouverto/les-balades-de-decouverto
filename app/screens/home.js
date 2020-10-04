@@ -144,7 +144,7 @@ export default class HomeScreen extends React.Component {
         );
     }
 
-    downloadMap (id, progress, cb) {
+    downloadMap (km, id, progress, cb) {
         fs.readFile(rootDirectory + id + '/index.json').then((response) => {
             data = JSON.parse(response);
 
@@ -278,7 +278,7 @@ export default class HomeScreen extends React.Component {
                                         };
                                         this.setState({
                                             downloading: false
-                                        }, (message) => {
+                                        }, () => {
                                             this.openWalk(data);
                                         });
                                     })

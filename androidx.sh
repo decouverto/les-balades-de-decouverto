@@ -20,4 +20,8 @@ do
 	replace+="; s/$from/$to/g"
 done <<< "$(cat $MAPPING_FILE)"
 
-find $PROJECT_DIR \( -name "*.java" -o -name "*.xml" \) -type f -not -path '*/\.git*' -print0 | xargs -0 sed -i "$replace" 
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	find $PROJECT_DIR \( -name "*.java" -o -name "*.xml" \) -type f -not -path '*/\.git*' -print0 | xargs -0 gsed -i "$replace" 
+else
+	find $PROJECT_DIR \( -name "*.java" -o -name "*.xml" \) -type f -not -path '*/\.git*' -print0 | xargs -0 sed -i "$replace" 
+fi

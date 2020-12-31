@@ -67,7 +67,7 @@ sdk.dir = /Users/cedricjung/Library/Android/sdk
 
 [Could not find tools.jar](https://stackoverflow.com/questions/64968851/could-not-find-tools-jar-please-check-that-library-internet-plug-ins-javaapple)
 
-Copy the following path
+Copy the following path:
 ```
 /usr/libexec/java_home -V | grep jdk
 ```
@@ -90,6 +90,19 @@ cd ~/Library/Android/sdk/emulator
 ./emulator -list-avds
 ./emulator @Pixel_3a_API_30_x86 -dns-server 8.8.8.8
 ```
+
+**==>** I created two bash files you need to excute this way:
+```
+. mac-env.sh
+```
+
+## Untrack file
+
+```
+git update-index --assume-unchanged android/gradle.properties 
+git update-index --assume-unchanged android/app/src/main/res/values/strings.xml 
+```
+
 ## Accept licenses
 
 See [https://stackoverflow.com/questions/39760172/you-have-not-accepted-the-license-agreements-of-the-following-sdk-components](https://stackoverflow.com/questions/39760172/you-have-not-accepted-the-license-agreements-of-the-following-sdk-components)

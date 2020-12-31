@@ -29,7 +29,7 @@
     "reset": "rm -rf node_modules/ && npm i && ./androidx.sh",
     "build": "cd android && ./gradlew bundleRelease",
     "build-apk": "cd android && ./gradlew assembleRelease",
-    "emulator": "cd ${ANDROID_HOME}/emulator && emulator -avd nexus"
+    "emulator": "emulator -avd $(emulator -list-avds | head -n 1) -dns-server 8.8.8.8"
   },
   "jest": {
     "preset": "react-native"

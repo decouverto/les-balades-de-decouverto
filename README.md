@@ -58,6 +58,68 @@ or
 adb shell am start -W -a android.intent.action.VIEW -d "decouverto://decouverto/preview/jYW1cN8" com.lesbaladesdedecouverto
 ```
 
+## Mac bug
+
+Create `android/local.properties` file with 
+```
+sdk.dir = /Users/cedricjung/Library/Android/sdk
+```
+
+[Could not find tools.jar](https://stackoverflow.com/questions/64968851/could-not-find-tools-jar-please-check-that-library-internet-plug-ins-javaapple)
+
+Copy the following path:
+```
+/usr/libexec/java_home -V | grep jdk
+```
+
+```
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_271.jdk/Contents/Home
+export PATH=$JAVA_HOME/bin:$PATH
+```
+
+```
+export ANDROID_HOME=/Users/cedricjung/Library/Android/sdk
+export PATH=$ANDROID_HOME/platform-tools:$PATH
+export PATH=$ANDROID_HOME/tools:$PATH
+```
+
+
+DNS:
+```
+cd ~/Library/Android/sdk/emulator
+./emulator -list-avds
+./emulator @Pixel_3a_API_30_x86 -dns-server 8.8.8.8
+```
+
+**==>** I created two bash files you need to excute this way:
+```
+. mac-env.sh
+```
+
+## Untrack file
+
+```
+git update-index --assume-unchanged android/gradle.properties 
+git update-index --assume-unchanged android/app/src/main/res/values/strings.xml 
+```
+
+## Accept licenses
+
+See [https://stackoverflow.com/questions/39760172/you-have-not-accepted-the-license-agreements-of-the-following-sdk-components](https://stackoverflow.com/questions/39760172/you-have-not-accepted-the-license-agreements-of-the-following-sdk-components)
+
+
+## Signing strategy
+
+In `android/gradle.properties` file  
+```
+android.useAndroidX=true
+android.enableJetifier=true
+MYAPP_RELEASE_STORE_FILE=les-balades-de-decouverto.keystore
+MYAPP_RELEASE_STORE_PASSWORD=******************************
+MYAPP_RELEASE_KEY_ALIAS=les-balades-de-decouverto
+MYAPP_RELEASE_KEY_PASSWORD=******************************
+```
+
 ## Available Scripts
 
 If Yarn was installed when the project was initialized, then dependencies will have been installed via Yarn, and you should probably use it to run these commands as well. Unlike dependency installation, command running syntax is identical for Yarn and NPM at the time of this writing.

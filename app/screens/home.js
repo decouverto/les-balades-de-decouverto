@@ -170,7 +170,7 @@ export default class HomeScreen extends React.Component {
                                 callback(err)
                             } else {
                                 fs.downloadFile({
-                                    fromUrl: 'https://a.tile.openstreetmap.org/' + tile.z + '/' + tile.x + '/' + tile.y + '.png', // to do add random for server URL
+                                    fromUrl: 'https://a.tile.openstreetmap.de/' + tile.z + '/' + tile.x + '/' + tile.y + '.png', // to do add random for server URL
                                     toFile: rootDirectory + '/' + id + '/' + tile.z + '/' + tile.x + '/' + tile.y + '.png'
                                 }).promise.then((result) => {
                                     size += result.bytesWritten;

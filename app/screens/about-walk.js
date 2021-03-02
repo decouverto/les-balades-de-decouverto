@@ -127,9 +127,10 @@ export default class AboutWalkScreen extends React.Component {
                                 callback(err)
                             } else {
                                 fs.downloadFile({
-                                    fromUrl: 'https://b.tile.openstreetmap.org/' + tile.z + '/' + tile.x + '/' + tile.y + '.png', // to do add random for server URL
+                                    fromUrl: 'https://b.tile.openstreetmap.de/' + tile.z + '/' + tile.x + '/' + tile.y + '.png', // to do add random for server URL
                                     toFile: rootDirectory + '/' + id + '/' + tile.z + '/' + tile.x + '/' + tile.y + '.png'
                                 }).promise.then((result) => {
+                                    //console.warn(result);
                                     size += result.bytesWritten;
                                     c+=1;
                                     progress(c/n)

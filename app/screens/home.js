@@ -23,7 +23,7 @@ export default class HomeScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        let state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], downloading: false, selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: false }
+        let state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], downloading: false, selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: true }
         if (this.props.navigation.state.params && this.props.navigation.state.params.hasOwnProperty('selectedType')) {
             state.selectedType = this.props.navigation.state.params.selectedType;
             this.props.navigation.setParams({ selectedType: 'all' });
@@ -440,12 +440,18 @@ export default class HomeScreen extends React.Component {
                     </Header>
                     <Content padder>
                         {(this.state.searching) ? (
-                            <Form>
-                                <Item style={{ marginBottom: 10 }}>
-                                    <Icon name='ios-search' />
-                                    <Input placeholder='Recherche' onChangeText={this.onSearch.bind(this)} value={this.state.search} />
-                                </Item>
-                            </Form>
+                            <View>
+                                <Button info onPress={() => console.error('Display search map')}>
+                                        <Icon name='map' />
+                                        <Text>Cartes des Balades</Text>
+                                </Button>
+                                <Form>
+                                    <Item style={{ marginBottom: 10 }}>
+                                        <Icon name='ios-search' />
+                                        <Input placeholder='Recherche' onChangeText={this.onSearch.bind(this)} value={this.state.search} />
+                                    </Item>
+                                </Form>
+                            </View>
                         ) : null}
                         {(this.state.walks != null && !this.state.searching) ? (
                             <View>

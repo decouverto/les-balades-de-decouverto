@@ -95,10 +95,14 @@ class SearchMapScreen extends React.Component {
                         notificationIconLarge: 'icon_location',
                         notificationIconSmall: 'icon_location'
                     });
+                    let centredOnce = false;
                     BackgroundGeolocation.on('location', (data) => {
                         if (this.refs.mapElement) {
                             let userLocation = { longitude: data.longitude, latitude: data.latitude };
                             this.setState({ userLocation });
+                            if (!centredOnce) {
+                                this.centerMap()
+                            }
                         }
                     });
                     BackgroundGeolocation.start();

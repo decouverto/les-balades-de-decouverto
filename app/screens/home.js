@@ -103,7 +103,7 @@ export default class HomeScreen extends React.Component {
             } else {
                 this.setState({
                     search: '',
-                    searching: false
+                    searching: true
                 }, this.calculateWlkToDisplay);
             }
             
@@ -441,7 +441,7 @@ export default class HomeScreen extends React.Component {
                     <Content padder>
                         {(this.state.searching) ? (
                             <View>
-                                <Button info onPress={() => console.error('Display search map')}>
+                                <Button info full onPress={() => this.props.navigation.navigate('SearchMap')}>
                                         <Icon name='map' />
                                         <Text>Cartes des Balades</Text>
                                 </Button>
@@ -503,7 +503,7 @@ export default class HomeScreen extends React.Component {
                                                             <Text note>Tracé uniquement</Text>
                                                         ) : (
                                                                 <Text note>Balade commentée</Text>
-                                                            )}
+                                                        )}
                                                     </Body>
                                                 </Left>
                                             </CardItem>

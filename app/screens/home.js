@@ -19,14 +19,14 @@ import tileList from 'osm-tile-list-json';
 import { each } from 'async';
 
 function makeid(length) {
-    var result           = [];
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var result = [];
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-      result.push(characters.charAt(Math.floor(Math.random() * 
- charactersLength)));
-   }
-   return result.join('');
+    for (var i = 0; i < length; i++) {
+        result.push(characters.charAt(Math.floor(Math.random() *
+            charactersLength)));
+    }
+    return result.join('');
 }
 
 export default class HomeScreen extends React.Component {
@@ -43,11 +43,13 @@ export default class HomeScreen extends React.Component {
                     state.search = '';
                     state.searching = true;
                 }
+            } else {
+                if (this.props.navigation.state.params.hasOwnProperty('search')) {
+                    state.search = this.props.navigation.state.params.search;
+                    state.searching = true;
+                }
             }
-            if (this.props.navigation.state.params.hasOwnProperty('search')) {
-                state.search = this.props.navigation.state.params.search;
-                state.searching = true;
-            }
+
         }
         this.state = state;
     }
@@ -128,12 +130,13 @@ export default class HomeScreen extends React.Component {
                         searching: true
                     }, this.calculateWlkToDisplay);
                 }
-            }
-            if (nextProps.navigation.state.params.hasOwnProperty('search')) {
-                this.setState({
-                    search: nextProps.navigation.state.params.search,
-                    searching: true
-                }, this.calculateWlkToDisplay);
+            } else {
+                if (nextProps.navigation.state.params.hasOwnProperty('search')) {
+                    this.setState({
+                        search: nextProps.navigation.state.params.search,
+                        searching: true
+                    }, this.calculateWlkToDisplay);
+                }
             }
         }
     }
@@ -172,7 +175,7 @@ export default class HomeScreen extends React.Component {
         );
     }
 
-    downloadMap (km, id, progress, cb) {
+    downloadMap(km, id, progress, cb) {
         fs.readFile(rootDirectory + id + '/index.json').then((response) => {
             data = JSON.parse(response);
 
@@ -202,20 +205,20 @@ export default class HomeScreen extends React.Component {
                                     toFile: rootDirectory + '/' + id + '/' + tile.z + '/' + tile.x + '/' + tile.y + '.png'
                                 }).promise.then((result) => {
                                     size += result.bytesWritten;
-                                    c+=1;
-                                    progress(c/n)
+                                    c += 1;
+                                    progress(c / n)
                                     callback();
                                 }).catch(callback)
                             }
                         });
                     }
                 });
-            }, function() {
+            }, function () {
                 cb(null, size)
             });
-        
-            
-        }).catch(function(err) {
+
+
+        }).catch(function (err) {
             console.warn(err)
             cb(true)
         })
@@ -274,7 +277,7 @@ export default class HomeScreen extends React.Component {
                                         });
                                     }, (err, mapSize) => {
                                         DialogProgress.hide();
-                                        if (err) { 
+                                        if (err) {
                                             if (Math.floor(size * 1e-6) == 0) {
                                                 size = Math.floor(size * 1e-3) + ' ko';
                                             } else {
@@ -289,7 +292,7 @@ export default class HomeScreen extends React.Component {
                                                 { cancelable: false }
                                             );
                                         } else {
-                                            size+=mapSize;
+                                            size += mapSize;
                                             if (Math.floor(size * 1e-6) == 0) {
                                                 size = Math.floor(size * 1e-3) + ' ko';
                                             } else {
@@ -472,8 +475,8 @@ export default class HomeScreen extends React.Component {
                         {(this.state.searching) ? (
                             <View>
                                 <Button info full onPress={() => this.props.navigation.navigate('SearchMap')}>
-                                        <Icon name='map' />
-                                        <Text>Cartes des Balades</Text>
+                                    <Icon name='map' />
+                                    <Text>Cartes des Balades</Text>
                                 </Button>
                                 <Form>
                                     <Item style={{ marginBottom: 10 }}>
@@ -520,7 +523,7 @@ export default class HomeScreen extends React.Component {
                         <H1>Balades</H1>
                         <FlatList
                             data={this.state.wlkToDisplay}
-                            renderItem={({item}) => {
+                            renderItem={({ item }) => {
                                 return (
                                     <ListItem>
                                         <Card red-border={item.downloaded} book-background={(item.fromBook == 'true')} >
@@ -533,7 +536,7 @@ export default class HomeScreen extends React.Component {
                                                             <Text note>Tracé uniquement</Text>
                                                         ) : (
                                                                 <Text note>Balade commentée</Text>
-                                                        )}
+                                                            )}
                                                     </Body>
                                                 </Left>
                                             </CardItem>

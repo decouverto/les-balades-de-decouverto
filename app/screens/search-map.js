@@ -11,7 +11,7 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import KeepAwake from 'react-native-keep-awake';
-
+import distanceBtwPoints from 'distance-between-points';
 
 class SearchMapScreen extends React.Component {
 
@@ -101,7 +101,8 @@ class SearchMapScreen extends React.Component {
                             let userLocation = { longitude: data.longitude, latitude: data.latitude };
                             this.setState({ userLocation });
                             if (!centredOnce) {
-                                this.centerMap()
+                                this.centerMap();
+                                centredOnce = true;
                             }
                         }
                     });
@@ -132,6 +133,7 @@ class SearchMapScreen extends React.Component {
         });
     }
 
+
     render() {
         return (
             <StyleProvider style={getTheme(material)}>
@@ -148,19 +150,26 @@ class SearchMapScreen extends React.Component {
                             <Title>Carte des balades</Title>
                         </Body>
                         <Right>
-                            <Button transparent onPress={() =>
+                            <Button transparent onPress={() => {
+                                var points = this.state.points;
+                                points.forEach((point, k) => {
+                                    points[k].distance = distanceBtwPoints(this.state.userLocation, point.coord);
+                                });
+                                points.sort((a, b) => a.distance - b.distance);
                                 ActionSheet.show(
                                     {
-                                        options: this.state.points.map(i => i.title),
+                                        options: points.map(point => {
+                                            return point.title + ' (à ' + (point.distance/1000).toFixed(1) + ' km)'
+                                        }),
                                         cancelButtonIndex: 'Annuler',
-                                        title: 'Navigation rapide'
+                                        title: 'Balade les plus proches'
                                     },
                                     pointIndex => {
                                         if (pointIndex !== 'Annuler') {
-                                            // add action there
+                                            this.props.navigation.navigate('Home', { search: points[pointIndex].title })
                                         }
                                     }
-                                )}
+                                )}}
                             >
                                 <Icon name='list' />
                             </Button>
@@ -185,7 +194,7 @@ class SearchMapScreen extends React.Component {
                         <View>
                             {this.state.points.map(marker => (
                                 <Marker
-                                    onCalloutPress={() => this.props.navigation.navigate('Home', {search: marker.title})}
+                                    onCalloutPress={() => this.props.navigation.navigate('Home', { search: marker.title })}
                                     coordinate={marker.coord}
                                     title={marker.title}
                                     ref={marker.id}

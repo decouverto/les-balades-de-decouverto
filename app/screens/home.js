@@ -1,7 +1,7 @@
 import React from 'react';
-import { Platform, Linking, Alert, View, Share } from 'react-native';
+import { Platform, Linking, Alert, View, Share, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import { Container, Header, Picker, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, List, ListItem, Form, Item, Input } from 'native-base';
+import { Container, Header, Picker, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, ListItem, Form, Item, Input } from 'native-base';
 
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
@@ -18,6 +18,16 @@ const rootDirectory = fs.ExternalDirectoryPath + '/';
 import tileList from 'osm-tile-list-json';
 import { each } from 'async';
 
+function makeid(length) {
+    var result           = [];
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+      result.push(characters.charAt(Math.floor(Math.random() * 
+ charactersLength)));
+   }
+   return result.join('');
+}
 
 export default class HomeScreen extends React.Component {
 
@@ -345,6 +355,7 @@ export default class HomeScreen extends React.Component {
             var found = this.state.walks.find(function (element) {
                 return element.id === id;
             });
+            found.key = id + makeid(3);
             if (found) {
                 return this.setState({ wlkToDisplay: [found], searching: true, search: found.title });
             }
@@ -367,6 +378,7 @@ export default class HomeScreen extends React.Component {
                 }
             }
             if (!err) {
+                data.key = data.key + makeid(3);
                 data.downloaded = this.isDownloaded(data.id);
                 arr.push(data);
             }
@@ -506,18 +518,18 @@ export default class HomeScreen extends React.Component {
                             </View>
                         ) : null}
                         <H1>Balades</H1>
-                        <List
-                            dataArray={this.state.wlkToDisplay}
-                            renderRow={data => {
+                        <FlatList
+                            data={this.state.wlkToDisplay}
+                            renderItem={({item}) => {
                                 return (
                                     <ListItem>
-                                        <Card red-border={data.downloaded} book-background={(data.fromBook == 'true')} >
+                                        <Card red-border={item.downloaded} book-background={(item.fromBook == 'true')} >
                                             <CardItem header>
                                                 <Left>
                                                     <Body>
-                                                        <H3>{data.title}</H3>
-                                                        <Text note>{(data.distance / 1000).toFixed(1)}km</Text>
-                                                        {(data.fromBook == 'true') ? (
+                                                        <H3>{item.title}</H3>
+                                                        <Text note>{(item.distance / 1000).toFixed(1)}km</Text>
+                                                        {(item.fromBook == 'true') ? (
                                                             <Text note>Tracé uniquement</Text>
                                                         ) : (
                                                                 <Text note>Balade commentée</Text>
@@ -527,21 +539,21 @@ export default class HomeScreen extends React.Component {
                                             </CardItem>
                                             <CardItem>
                                                 <Body>
-                                                    <Text italic={data.fromBook}>{data.description}</Text>
+                                                    <Text italic={item.fromBook}>{item.description}</Text>
                                                 </Body>
                                             </CardItem>
                                             <CardItem footer>
-                                                {(data.downloaded) ? (
-                                                    <Button light onPress={() => this.openWalk(data)}>
+                                                {(item.downloaded) ? (
+                                                    <Button light onPress={() => this.openWalk(item)}>
                                                         <Text>Ouvrir</Text>
                                                     </Button>
                                                 ) : (
-                                                        <Button light onPress={() => this.downloadWalk(data)}>
+                                                        <Button light onPress={() => this.downloadWalk(item)}>
                                                             <Text>Télécharger</Text>
                                                         </Button>
                                                     )}
                                                 <Right>
-                                                    <Icon name='share' style={{ alignSelf: 'flex-end', color: '#a7a7a7' }} onPress={() => this.shareWalk(data)} />
+                                                    <Icon name='share' style={{ alignSelf: 'flex-end', color: '#a7a7a7' }} onPress={() => this.shareWalk(item)} />
                                                 </Right>
                                             </CardItem>
                                         </Card>

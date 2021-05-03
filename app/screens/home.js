@@ -33,7 +33,8 @@ export default class HomeScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        let state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], downloading: false, selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: true }
+        this.openLastWalk = this.openLastWalk.bind(this);
+        let state = { lastWalk: false, errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], downloading: false, selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: true }
         if (this.props.navigation.state.params) {
             if (this.props.navigation.state.params.hasOwnProperty('onlyBook')) {
                 if (this.props.navigation.state.params.onlyBook) {
@@ -114,7 +115,11 @@ export default class HomeScreen extends React.Component {
                 });
             SplashScreen.hide();
         });
-        // TODO: Add last walk button
+        AsyncStorage.getItem('last-walk-opened', (err, value) => {
+            if (!err && value !== null) {
+                this.setState({ lastWalk: value })
+            }
+        });
     }
 
     componentWillReceiveProps(nextProps) {
@@ -152,7 +157,7 @@ export default class HomeScreen extends React.Component {
             const id = route.match(/\/([^\/]+)\/?$/)[1];
             const routeName = route.split('/')[1];
             if (routeName === 'rando') {
-                this.calculateWlkToDisplay(id)
+                this.calculateWlkToDisplay(id);
             }
         }
     }
@@ -337,8 +342,8 @@ export default class HomeScreen extends React.Component {
 
 
     openLastWalk() {
-        let walkKey = this.state.walks.find(el => el.id == id);
-        if (typeof walkKey == 'undefined') {
+        let walk = this.state.walks.find(el => el.id == this.state.lastWalk);
+        if (typeof walk == 'undefined') {
             Alert.alert(
                 'Erreur',
                 'Aucune balade n\'a été ouverte récemment.',
@@ -348,9 +353,19 @@ export default class HomeScreen extends React.Component {
                 { cancelable: false }
             );
         } else {
-            let walk = this.state.walks[walkKey];
-            if (walk.isDownloaded) {
-                openWalk(walk);
+            if (this.isDownloaded(walk.id)) {
+                fs.readFile(rootDirectory + walk.id + '/index.json').then((response) => {
+                    this.props.navigation.navigate('Map', { ...walk, ...JSON.parse(response) });
+                }).catch(() => {
+                    Alert.alert(
+                        'Erreur',
+                        'Impossible de lire le parcours.',
+                        [
+                            { text: 'Ok' },
+                        ],
+                        { cancelable: false }
+                    );
+                });
             } else {
                 Alert.alert(
                     'Erreur',
@@ -377,7 +392,7 @@ export default class HomeScreen extends React.Component {
                 ],
                 { cancelable: false }
             );
-        })
+        });
     }
 
     shareWalk(data) {
@@ -393,7 +408,7 @@ export default class HomeScreen extends React.Component {
             var found = this.state.walks.find(function (element) {
                 return element.id === id;
             });
-            found.key = id + makeid(3);
+            found.key = id + makeid(4);
             if (found) {
                 return this.setState({ wlkToDisplay: [found], searching: true, search: found.title });
             }
@@ -416,7 +431,7 @@ export default class HomeScreen extends React.Component {
                 }
             }
             if (!err) {
-                data.key = data.key + makeid(3);
+                data.key = data.key + makeid(4);
                 data.downloaded = this.isDownloaded(data.id);
                 arr.push(data);
             }
@@ -507,6 +522,12 @@ export default class HomeScreen extends React.Component {
                         </Right>
                     </Header>
                     <Content padder>
+                        {(this.state.lastWalk && this.isDownloaded(this.state.lastWalk)) ? (
+                            <Button success full onPress={this.openLastWalk} style={{marginBottom: 10}}>
+                                <Icon name='ios-walk' />
+                                <Text>Dernière balade ouverte</Text>
+                            </Button>
+                        ) : null}
                         {(this.state.searching) ? (
                             <View>
                                 <Button info full onPress={() => this.props.navigation.navigate('SearchMap')}>

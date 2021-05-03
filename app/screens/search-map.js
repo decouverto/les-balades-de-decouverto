@@ -28,7 +28,8 @@ class SearchMapScreen extends React.Component {
     }
 
     componentDidMount() {
-        // Todo: Define points thanks https://decouverto.fr/walks/first-points.json
+        this._mounted = true;
+
         // Function to check that the user is connected and that the user want to use his network
         function allowAccess(state, allow, quit) {
             if (state.isConnected) {
@@ -43,59 +44,73 @@ class SearchMapScreen extends React.Component {
                                 onPress: quit,
                                 style: 'cancel'
                             },
-                            { text: 'Utiliser internet', allow }
+                            { text: 'Utiliser internet', onPress: allow }
                         ]
                     );
                 }
             } else {
                 Alert.alert('Internet nécessaire',
                     'Internet est nécessaire pour utiliser cette fonctionnalité. Veuillez-vous connecter à Internet pour l\'utiliser.',
-                    [{ text: 'D\'accord', quit }]
+                    [{ text: 'D\'accord', onPress: quit }]
                 );
             }
         }
+
         NetInfo.fetch().then(state => {
             allowAccess(state, () => {
-                console.error('OK')
+                fetch('https://decouverto.fr/walks/first-points.json')
+                    .then((response) => response.json())
+                    .then((responseJson) => {
+                        if (this._mounted) {
+                            this.setState({
+                                points: responseJson
+                            });
+                        }
+                    })
+                    .catch(() => {
+                        Alert.alert('Internet nécessaire',
+                            'Internet est nécessaire pour utiliser cette fonctionnalité. Veuillez-vous connecter à Internet pour l\'utiliser.',
+                            [{ text: 'D\'accord' }]
+                        );
+                    });
+                LocationServicesDialogBox.checkLocationServicesIsEnabled({
+                    message: 'Vous devez activer la localisation pour que l\'application fonctionne au mieux.',
+                    ok: 'D\'accord',
+                    cancel: 'Annuler'
+                }).then(() => {
+                    BackgroundGeolocation.configure({
+                        desiredAccuracy: 0,
+                        stationaryRadius: 50,
+                        distanceFilter: 50,
+                        locationTimeout: 30,
+                        notificationTitle: 'Les Balades de Découverto',
+                        notificationText: 'Affichage des balades à proximité...',
+                        startOnBoot: false,
+                        stopOnTerminate: true,
+                        locationProvider: BackgroundGeolocation.provider.ANDROID_ACTIVITY_PROVIDER,
+                        interval: 50000,
+                        fastestInterval: 25000,
+                        activitiesInterval: 50000,
+                        stopOnStillActivity: false,
+                        notificationIconLarge: 'icon_location',
+                        notificationIconSmall: 'icon_location'
+                    });
+                    BackgroundGeolocation.on('location', (data) => {
+                        if (this.refs.mapElement) {
+                            let userLocation = { longitude: data.longitude, latitude: data.latitude };
+                            this.setState({ userLocation });
+                        }
+                    });
+                    BackgroundGeolocation.start();
+                });
             }, () => {
                 this.props.navigation.navigate('Home')
             });
         });
-        LocationServicesDialogBox.checkLocationServicesIsEnabled({
-            message: 'Vous devez activer la localisation pour que l\'application fonctionne.',
-            ok: 'D\'accord',
-            cancel: 'Annuler'
-        }).then((success) => {
-            BackgroundGeolocation.configure({
-                desiredAccuracy: 0,
-                stationaryRadius: 50,
-                distanceFilter: 50,
-                locationTimeout: 30,
-                notificationTitle: 'Les Balades de Découverto',
-                notificationText: 'Affichage des balades à proximité...',
-                startOnBoot: false,
-                stopOnTerminate: true,
-                locationProvider: BackgroundGeolocation.provider.ANDROID_ACTIVITY_PROVIDER,
-                interval: 50000,
-                fastestInterval: 25000,
-                activitiesInterval: 50000,
-                stopOnStillActivity: false,
-                notificationIconLarge: 'icon_location',
-                notificationIconSmall: 'icon_location'
-            });
-            BackgroundGeolocation.on('location', (data) => {
-                if (this.refs.mapElement) {
-                    let userLocation = { longitude: data.longitude, latitude: data.latitude };
-                    this.setState({ userLocation });
-                }
-            });
-            BackgroundGeolocation.start();
-        }).catch((error) => {
-            this.props.navigation.navigate('Home');
-        });
     }
 
     componentWillUnmount() {
+        this._mounted = false;
         BackgroundGeolocation.stop();
     }
 
@@ -166,11 +181,11 @@ class SearchMapScreen extends React.Component {
                         <View>
                             {this.state.points.map(marker => (
                                 <Marker
-                                    onCalloutPress={() => console.error(marker)}
-                                    coordinate={marker.coords}
+                                    onCalloutPress={() => this.props.navigation.navigate('Home', {search: marker.title})}
+                                    coordinate={marker.coord}
                                     title={marker.title}
-                                    ref={marker.title}
-                                    key={marker.title}
+                                    ref={marker.id}
+                                    key={marker.id}
                                 />
 
                             ))}

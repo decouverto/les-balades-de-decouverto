@@ -24,9 +24,20 @@ export default class HomeScreen extends React.Component {
     constructor(props) {
         super(props);
         let state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], downloading: false, selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: true }
-        if (this.props.navigation.state.params && this.props.navigation.state.params.hasOwnProperty('selectedType')) {
-            state.selectedType = this.props.navigation.state.params.selectedType;
-            this.props.navigation.setParams({ selectedType: 'all' });
+        if (this.props.navigation.state.params) {
+            if (this.props.navigation.state.params.hasOwnProperty('onlyBook')) {
+                if (this.props.navigation.state.params.onlyBook) {
+                    state.search = 'livre';
+                    state.searching = true;
+                } else {
+                    state.search = '';
+                    state.searching = true;
+                }
+            }
+            if (this.props.navigation.state.params.hasOwnProperty('search')) {
+                state.search = this.props.navigation.state.params.search;
+                state.searching = true;
+            }
         }
         this.state = state;
     }
@@ -94,19 +105,26 @@ export default class HomeScreen extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.navigation.state.params && nextProps.navigation.state.params.hasOwnProperty('onlyBook')) {
-            if (nextProps.navigation.state.params.onlyBook) {
+        if (nextProps.navigation.state.params) {
+            if (nextProps.navigation.state.params.hasOwnProperty('onlyBook')) {
+                if (nextProps.navigation.state.params.onlyBook) {
+                    this.setState({
+                        search: 'livre',
+                        searching: true
+                    }, this.calculateWlkToDisplay);
+                } else {
+                    this.setState({
+                        search: '',
+                        searching: true
+                    }, this.calculateWlkToDisplay);
+                }
+            }
+            if (nextProps.navigation.state.params.hasOwnProperty('search')) {
                 this.setState({
-                    search: 'livre',
-                    searching: true
-                }, this.calculateWlkToDisplay);
-            } else {
-                this.setState({
-                    search: '',
+                    search: nextProps.navigation.state.params.search,
                     searching: true
                 }, this.calculateWlkToDisplay);
             }
-            
         }
     }
 

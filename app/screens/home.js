@@ -114,6 +114,7 @@ export default class HomeScreen extends React.Component {
                 });
             SplashScreen.hide();
         });
+        // TODO: Add last walk button
     }
 
     componentWillReceiveProps(nextProps) {
@@ -330,8 +331,42 @@ export default class HomeScreen extends React.Component {
         return false;
     }
 
+    saveLastWalkOpened(id) {
+        AsyncStorage.setItem('last-walk-opened', id);
+    }
+
+
+    openLastWalk() {
+        let walkKey = this.state.walks.find(el => el.id == id);
+        if (typeof walkKey == 'undefined') {
+            Alert.alert(
+                'Erreur',
+                'Aucune balade n\'a été ouverte récemment.',
+                [
+                    { text: 'Ok' },
+                ],
+                { cancelable: false }
+            );
+        } else {
+            let walk = this.state.walks[walkKey];
+            if (walk.isDownloaded) {
+                openWalk(walk);
+            } else {
+                Alert.alert(
+                    'Erreur',
+                    'La balade n\'est plus disponible sur votre téléphone.',
+                    [
+                        { text: 'Ok' },
+                    ],
+                    { cancelable: false }
+                );
+            }
+        }
+    }
+
     openWalk(data) {
         fs.readFile(rootDirectory + data.id + '/index.json').then((response) => {
+            this.saveLastWalkOpened(data.id);
             this.props.navigation.navigate('AboutWalk', { ...data, ...JSON.parse(response) });
         }).catch(() => {
             Alert.alert(

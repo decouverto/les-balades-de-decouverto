@@ -1,6 +1,8 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Container, Header, Title, Left, Icon, Right, Body, Content, Text, StyleProvider, Button, ActionSheet } from 'native-base';
+import { StyleSheet, View, Alert } from 'react-native';
+import { Container, Header, Title, Left, Icon, Right, Body, Text, StyleProvider, Button, ActionSheet } from 'native-base';
+
+import NetInfo from "@react-native-community/netinfo";
 
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
@@ -27,6 +29,38 @@ class SearchMapScreen extends React.Component {
 
     componentDidMount() {
         // Todo: Define points thanks https://decouverto.fr/walks/first-points.json
+        // Function to check that the user is connected and that the user want to use his network
+        function allowAccess(state, allow, quit) {
+            if (state.isConnected) {
+                if (state.isWifiEnabled) {
+                    allow();
+                } else {
+                    Alert.alert('Internet nécessaire',
+                        'Internet est nécessaire pour utiliser cette fonctionnalité, voulez-vous utiliser vos données mobiles ?',
+                        [
+                            {
+                                text: 'Annuler',
+                                onPress: quit,
+                                style: 'cancel'
+                            },
+                            { text: 'Utiliser internet', allow }
+                        ]
+                    );
+                }
+            } else {
+                Alert.alert('Internet nécessaire',
+                    'Internet est nécessaire pour utiliser cette fonctionnalité. Veuillez-vous connecter à Internet pour l\'utiliser.',
+                    [{ text: 'D\'accord', quit }]
+                );
+            }
+        }
+        NetInfo.fetch().then(state => {
+            allowAccess(state, () => {
+                console.error('OK')
+            }, () => {
+                this.props.navigation.navigate('Home')
+            });
+        });
         LocationServicesDialogBox.checkLocationServicesIsEnabled({
             message: 'Vous devez activer la localisation pour que l\'application fonctionne.',
             ok: 'D\'accord',
@@ -67,11 +101,11 @@ class SearchMapScreen extends React.Component {
 
     centerMap() {
         let borders = [{
-            latitude: this.state.userLocation.latitude + 1,
-            longitude: this.state.userLocation.longitude + 1
+            latitude: this.state.userLocation.latitude + 0.5,
+            longitude: this.state.userLocation.longitude + 0.5
         }, {
-            latitude: this.state.userLocation.latitude - 1,
-            longitude: this.state.userLocation.longitude - 1
+            latitude: this.state.userLocation.latitude - 0.5,
+            longitude: this.state.userLocation.longitude - 0.5
         }]
         this.refs.mapElement.fitToCoordinates(borders, {
             edgePadding: { top: 10, right: 10, bottom: 10, left: 10 },
@@ -128,18 +162,18 @@ class SearchMapScreen extends React.Component {
                         mapType={'terrain'}
                         loadingEnabled={true}
                         ref='mapElement'>
-                        
+
                         <View>
-                        {this.state.points.map(marker => (
-                            <Marker
-                                onCalloutPress={() => console.error(marker) }
-                                coordinate={marker.coords}
-                                title={marker.title}
-                                ref={marker.title}
-                                key={marker.title}
-                            />
-                            
-                        ))}
+                            {this.state.points.map(marker => (
+                                <Marker
+                                    onCalloutPress={() => console.error(marker)}
+                                    coordinate={marker.coords}
+                                    title={marker.title}
+                                    ref={marker.title}
+                                    key={marker.title}
+                                />
+
+                            ))}
                         </View>
                     </MapView>
                     <Button style={styles.button_map} onPress={this.centerMap}>

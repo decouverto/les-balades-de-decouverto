@@ -36,14 +36,9 @@ export default class HomeScreen extends React.Component {
         this.openLastWalk = this.openLastWalk.bind(this);
         let state = { lastWalk: false, errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], downloading: false, selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: true }
         if (this.props.navigation.state.params) {
-            if (this.props.navigation.state.params.hasOwnProperty('onlyBook')) {
-                if (this.props.navigation.state.params.onlyBook) {
-                    state.search = 'livre';
-                    state.searching = true;
-                } else {
-                    state.search = '';
-                    state.searching = true;
-                }
+            if (this.props.navigation.state.params.hasOwnProperty('onlyBook') && this.props.navigation.state.params.onlyBook) {
+                state.search = 'livre';
+                state.searching = true;
             } else {
                 if (this.props.navigation.state.params.hasOwnProperty('search')) {
                     state.search = this.props.navigation.state.params.search;
@@ -124,18 +119,11 @@ export default class HomeScreen extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.navigation.state.params) {
-            if (nextProps.navigation.state.params.hasOwnProperty('onlyBook')) {
-                if (nextProps.navigation.state.params.onlyBook) {
-                    this.setState({
-                        search: 'livre',
-                        searching: true
-                    }, this.calculateWlkToDisplay);
-                } else {
-                    this.setState({
-                        search: '',
-                        searching: true
-                    }, this.calculateWlkToDisplay);
-                }
+            if (nextProps.navigation.state.params.hasOwnProperty('onlyBook') && nextProps.navigation.state.params.onlyBook) {
+                this.setState({
+                    search: 'livre',
+                    searching: true
+                }, this.calculateWlkToDisplay);
             } else {
                 if (nextProps.navigation.state.params.hasOwnProperty('search')) {
                     this.setState({
@@ -523,7 +511,7 @@ export default class HomeScreen extends React.Component {
                     </Header>
                     <Content padder>
                         {(this.state.lastWalk && this.isDownloaded(this.state.lastWalk)) ? (
-                            <Button success full onPress={this.openLastWalk} style={{marginBottom: 10}}>
+                            <Button success full onPress={this.openLastWalk} style={{ marginBottom: 10 }}>
                                 <Icon name='ios-walk' />
                                 <Text>Dernière balade ouverte</Text>
                             </Button>

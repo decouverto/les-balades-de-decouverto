@@ -166,7 +166,7 @@ class SearchMapScreen extends React.Component {
                                     },
                                     pointIndex => {
                                         if (pointIndex !== 'Annuler') {
-                                            this.props.navigation.navigate('Home', { search: points[pointIndex].title })
+                                            this.props.navigation.navigate('Home', { search: points[pointIndex].title, onlyBook: false })
                                         }
                                     }
                                 )}}
@@ -194,7 +194,7 @@ class SearchMapScreen extends React.Component {
                         <View>
                             {this.state.points.map(marker => (
                                 <Marker
-                                    onCalloutPress={() => this.props.navigation.navigate('Home', { search: marker.title })}
+                                    onCalloutPress={() => this.props.navigation.navigate('Home', { search: marker.title, onlyBook: false })}
                                     coordinate={marker.coord}
                                     title={marker.title}
                                     ref={marker.id}

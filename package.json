@@ -1,6 +1,6 @@
 {
   "name": "les-balades-de-decouverto",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "private": true,
   "devDependencies": {
     "@babel/core": "^7.4.5",

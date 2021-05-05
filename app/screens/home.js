@@ -1,7 +1,7 @@
 import React from 'react';
-import { Platform, Linking, Alert, View, Share } from 'react-native';
+import { Platform, Linking, Alert, View, Share, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import { Container, Header, Picker, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, List, ListItem, Form, Item, Input } from 'native-base';
+import { Container, Header, Picker, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, ListItem, Form, Item, Input } from 'native-base';
 
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
@@ -18,15 +18,34 @@ const rootDirectory = fs.ExternalDirectoryPath + '/';
 import tileList from 'osm-tile-list-json';
 import { each } from 'async';
 
+function makeid(length) {
+    var result = [];
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result.push(characters.charAt(Math.floor(Math.random() *
+            charactersLength)));
+    }
+    return result.join('');
+}
 
 export default class HomeScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        let state = { errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], downloading: false, selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: false }
-        if (this.props.navigation.state.params && this.props.navigation.state.params.hasOwnProperty('selectedType')) {
-            state.selectedType = this.props.navigation.state.params.selectedType;
-            this.props.navigation.setParams({ selectedType: 'all' });
+        this.openLastWalk = this.openLastWalk.bind(this);
+        let state = { lastWalk: false, errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], downloading: false, selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: true }
+        if (this.props.navigation.state.params) {
+            if (this.props.navigation.state.params.hasOwnProperty('onlyBook') && this.props.navigation.state.params.onlyBook) {
+                state.search = 'livre';
+                state.searching = true;
+            } else {
+                if (this.props.navigation.state.params.hasOwnProperty('search')) {
+                    state.search = this.props.navigation.state.params.search;
+                    state.searching = true;
+                }
+            }
+
         }
         this.state = state;
     }
@@ -91,22 +110,28 @@ export default class HomeScreen extends React.Component {
                 });
             SplashScreen.hide();
         });
+        AsyncStorage.getItem('last-walk-opened', (err, value) => {
+            if (!err && value !== null) {
+                this.setState({ lastWalk: value })
+            }
+        });
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.navigation.state.params && nextProps.navigation.state.params.hasOwnProperty('onlyBook')) {
-            if (nextProps.navigation.state.params.onlyBook) {
+        if (nextProps.navigation.state.params) {
+            if (nextProps.navigation.state.params.hasOwnProperty('onlyBook') && nextProps.navigation.state.params.onlyBook) {
                 this.setState({
                     search: 'livre',
                     searching: true
                 }, this.calculateWlkToDisplay);
             } else {
-                this.setState({
-                    search: '',
-                    searching: false
-                }, this.calculateWlkToDisplay);
+                if (nextProps.navigation.state.params.hasOwnProperty('search')) {
+                    this.setState({
+                        search: nextProps.navigation.state.params.search,
+                        searching: true
+                    }, this.calculateWlkToDisplay);
+                }
             }
-            
         }
     }
 
@@ -120,7 +145,7 @@ export default class HomeScreen extends React.Component {
             const id = route.match(/\/([^\/]+)\/?$/)[1];
             const routeName = route.split('/')[1];
             if (routeName === 'rando') {
-                this.calculateWlkToDisplay(id)
+                this.calculateWlkToDisplay(id);
             }
         }
     }
@@ -144,7 +169,7 @@ export default class HomeScreen extends React.Component {
         );
     }
 
-    downloadMap (km, id, progress, cb) {
+    downloadMap(km, id, progress, cb) {
         fs.readFile(rootDirectory + id + '/index.json').then((response) => {
             data = JSON.parse(response);
 
@@ -174,20 +199,20 @@ export default class HomeScreen extends React.Component {
                                     toFile: rootDirectory + '/' + id + '/' + tile.z + '/' + tile.x + '/' + tile.y + '.png'
                                 }).promise.then((result) => {
                                     size += result.bytesWritten;
-                                    c+=1;
-                                    progress(c/n)
+                                    c += 1;
+                                    progress(c / n)
                                     callback();
                                 }).catch(callback)
                             }
                         });
                     }
                 });
-            }, function() {
+            }, function () {
                 cb(null, size)
             });
-        
-            
-        }).catch(function(err) {
+
+
+        }).catch(function (err) {
             console.warn(err)
             cb(true)
         })
@@ -246,7 +271,7 @@ export default class HomeScreen extends React.Component {
                                         });
                                     }, (err, mapSize) => {
                                         DialogProgress.hide();
-                                        if (err) { 
+                                        if (err) {
                                             if (Math.floor(size * 1e-6) == 0) {
                                                 size = Math.floor(size * 1e-3) + ' ko';
                                             } else {
@@ -261,7 +286,7 @@ export default class HomeScreen extends React.Component {
                                                 { cancelable: false }
                                             );
                                         } else {
-                                            size+=mapSize;
+                                            size += mapSize;
                                             if (Math.floor(size * 1e-6) == 0) {
                                                 size = Math.floor(size * 1e-3) + ' ko';
                                             } else {
@@ -299,8 +324,52 @@ export default class HomeScreen extends React.Component {
         return false;
     }
 
+    saveLastWalkOpened(id) {
+        AsyncStorage.setItem('last-walk-opened', id);
+    }
+
+
+    openLastWalk() {
+        let walk = this.state.walks.find(el => el.id == this.state.lastWalk);
+        if (typeof walk == 'undefined') {
+            Alert.alert(
+                'Erreur',
+                'Aucune balade n\'a été ouverte récemment.',
+                [
+                    { text: 'Ok' },
+                ],
+                { cancelable: false }
+            );
+        } else {
+            if (this.isDownloaded(walk.id)) {
+                fs.readFile(rootDirectory + walk.id + '/index.json').then((response) => {
+                    this.props.navigation.navigate('Map', { ...walk, ...JSON.parse(response) });
+                }).catch(() => {
+                    Alert.alert(
+                        'Erreur',
+                        'Impossible de lire le parcours.',
+                        [
+                            { text: 'Ok' },
+                        ],
+                        { cancelable: false }
+                    );
+                });
+            } else {
+                Alert.alert(
+                    'Erreur',
+                    'La balade n\'est plus disponible sur votre téléphone.',
+                    [
+                        { text: 'Ok' },
+                    ],
+                    { cancelable: false }
+                );
+            }
+        }
+    }
+
     openWalk(data) {
         fs.readFile(rootDirectory + data.id + '/index.json').then((response) => {
+            this.saveLastWalkOpened(data.id);
             this.props.navigation.navigate('AboutWalk', { ...data, ...JSON.parse(response) });
         }).catch(() => {
             Alert.alert(
@@ -311,7 +380,7 @@ export default class HomeScreen extends React.Component {
                 ],
                 { cancelable: false }
             );
-        })
+        });
     }
 
     shareWalk(data) {
@@ -327,6 +396,7 @@ export default class HomeScreen extends React.Component {
             var found = this.state.walks.find(function (element) {
                 return element.id === id;
             });
+            found.key = id + makeid(4);
             if (found) {
                 return this.setState({ wlkToDisplay: [found], searching: true, search: found.title });
             }
@@ -349,6 +419,7 @@ export default class HomeScreen extends React.Component {
                 }
             }
             if (!err) {
+                data.key = data.key + makeid(4);
                 data.downloaded = this.isDownloaded(data.id);
                 arr.push(data);
             }
@@ -439,13 +510,25 @@ export default class HomeScreen extends React.Component {
                         </Right>
                     </Header>
                     <Content padder>
+                        {(this.state.lastWalk && this.isDownloaded(this.state.lastWalk)) ? (
+                            <Button success full onPress={this.openLastWalk} style={{ marginBottom: 10 }}>
+                                <Icon name='ios-walk' />
+                                <Text>Dernière balade ouverte</Text>
+                            </Button>
+                        ) : null}
                         {(this.state.searching) ? (
-                            <Form>
-                                <Item style={{ marginBottom: 10 }}>
-                                    <Icon name='ios-search' />
-                                    <Input placeholder='Recherche' onChangeText={this.onSearch.bind(this)} value={this.state.search} />
-                                </Item>
-                            </Form>
+                            <View>
+                                <Button info full onPress={() => this.props.navigation.navigate('SearchMap')}>
+                                    <Icon name='map' />
+                                    <Text>Cartes des Balades</Text>
+                                </Button>
+                                <Form>
+                                    <Item style={{ marginBottom: 10 }}>
+                                        <Icon name='ios-search' />
+                                        <Input placeholder='Recherche' onChangeText={this.onSearch.bind(this)} value={this.state.search} />
+                                    </Item>
+                                </Form>
+                            </View>
                         ) : null}
                         {(this.state.walks != null && !this.state.searching) ? (
                             <View>
@@ -482,18 +565,18 @@ export default class HomeScreen extends React.Component {
                             </View>
                         ) : null}
                         <H1>Balades</H1>
-                        <List
-                            dataArray={this.state.wlkToDisplay}
-                            renderRow={data => {
+                        <FlatList
+                            data={this.state.wlkToDisplay}
+                            renderItem={({ item }) => {
                                 return (
                                     <ListItem>
-                                        <Card red-border={data.downloaded} book-background={(data.fromBook == 'true')} >
+                                        <Card red-border={item.downloaded} book-background={(item.fromBook == 'true')} >
                                             <CardItem header>
                                                 <Left>
                                                     <Body>
-                                                        <H3>{data.title}</H3>
-                                                        <Text note>{(data.distance / 1000).toFixed(1)}km</Text>
-                                                        {(data.fromBook == 'true') ? (
+                                                        <H3>{item.title}</H3>
+                                                        <Text note>{(item.distance / 1000).toFixed(1)}km</Text>
+                                                        {(item.fromBook == 'true') ? (
                                                             <Text note>Tracé uniquement</Text>
                                                         ) : (
                                                                 <Text note>Balade commentée</Text>
@@ -503,21 +586,21 @@ export default class HomeScreen extends React.Component {
                                             </CardItem>
                                             <CardItem>
                                                 <Body>
-                                                    <Text italic={data.fromBook}>{data.description}</Text>
+                                                    <Text italic={item.fromBook}>{item.description}</Text>
                                                 </Body>
                                             </CardItem>
                                             <CardItem footer>
-                                                {(data.downloaded) ? (
-                                                    <Button light onPress={() => this.openWalk(data)}>
+                                                {(item.downloaded) ? (
+                                                    <Button light onPress={() => this.openWalk(item)}>
                                                         <Text>Ouvrir</Text>
                                                     </Button>
                                                 ) : (
-                                                        <Button light onPress={() => this.downloadWalk(data)}>
+                                                        <Button light onPress={() => this.downloadWalk(item)}>
                                                             <Text>Télécharger</Text>
                                                         </Button>
                                                     )}
                                                 <Right>
-                                                    <Icon name='share' style={{ alignSelf: 'flex-end', color: '#a7a7a7' }} onPress={() => this.shareWalk(data)} />
+                                                    <Icon name='share' style={{ alignSelf: 'flex-end', color: '#a7a7a7' }} onPress={() => this.shareWalk(item)} />
                                                 </Right>
                                             </CardItem>
                                         </Card>

@@ -29,7 +29,7 @@ export default class SideBar extends React.Component {
                     <ListItem
                         button
                         onPress={() => {
-                                this.props.navigation.navigate('Home', {onlyBook: false});
+                                this.props.navigation.navigate('Home', {onlyBook: false, search: ''});
                         }}>
                         <Icon name='ios-home' /><Text> Accueil</Text>
                     </ListItem>

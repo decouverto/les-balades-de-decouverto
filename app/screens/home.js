@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, Linking, Alert, View, Share, FlatList } from 'react-native';
+import { Platform, Linking, Alert, View, Share, FlatList, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { Container, Header, Picker, Title, Left, Icon, Right, Button, Body, Content, H1, H3, Text, Card, CardItem, StyleProvider, ListItem, Form, Item, Input } from 'native-base';
 
@@ -34,7 +34,7 @@ export default class HomeScreen extends React.Component {
     constructor(props) {
         super(props);
         this.openLastWalk = this.openLastWalk.bind(this);
-        let state = { lastWalk: false, errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], downloading: false, selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', searching: true }
+        let state = { lastWalk: false, errLoading: false, walks: [], downloadedWalks: [], wlkToDisplay: [], downloading: false, selectedSector: 'all', selectedTheme: 'all', selectedType: 'all', search: '', loading: false, searching: true }
         if (this.props.navigation.state.params) {
             if (this.props.navigation.state.params.hasOwnProperty('onlyBook') && this.props.navigation.state.params.onlyBook) {
                 state.search = 'livre';
@@ -398,7 +398,7 @@ export default class HomeScreen extends React.Component {
             });
             found.key = id + makeid(4);
             if (found) {
-                return this.setState({ wlkToDisplay: [found], searching: true, search: found.title });
+                return this.setState({ wlkToDisplay: [found], searching: true, search: found.title, loading: false });
             }
         }
         var arr = [];
@@ -430,31 +430,57 @@ export default class HomeScreen extends React.Component {
             if (b.downloaded && !a.downloaded) return 1
             return 0
         });
-        this.setState({ wlkToDisplay: arr })
+        this.setState({ wlkToDisplay: arr, loading: false})
     }
 
     onSectorChange(sector) {
         this.setState({
-            selectedSector: sector
+            selectedSector: sector,
+            loading: true
         }, this.calculateWlkToDisplay);
     }
 
     onThemeChange(theme) {
         this.setState({
-            selectedTheme: theme
+            selectedTheme: theme,
+            loading: true
         }, this.calculateWlkToDisplay);
     }
 
     onTypeChange(type) {
         this.setState({
-            selectedType: type
+            selectedType: type,
+            loading: true
         }, this.calculateWlkToDisplay);
     }
 
+    timerSearch = false;
     onSearch(search) {
+        clearTimeout(this.timerSearch);
         this.setState({
-            search: search
-        }, this.calculateWlkToDisplay);
+            search: search,
+            loading: true
+        }, () => {
+            this.timerSearch = setTimeout(() => this.calculateWlkToDisplay(), 100)
+        })
+    }
+
+    toggleMenu = true;
+    changeMenu() {
+        if (this.toggleMenu) {
+            this.toggleMenu = false;
+            this.setState({ 
+                searching: !this.state.searching, 
+                selectedTheme: 'all', 
+                selectedSector: 'all', 
+                selectedType: 'all', 
+                search: '',
+                loading: true
+            }, () => {
+                this.calculateWlkToDisplay();
+                this.toggleMenu = true;
+            });
+        }
     }
 
     render() {
@@ -504,7 +530,7 @@ export default class HomeScreen extends React.Component {
                         <Right>
                             <Button
                                 transparent
-                                onPress={() => this.setState({ searching: !this.state.searching, selectedTheme: 'all', selectedSector: 'all', selectedType: 'all', search: '' }, () => this.calculateWlkToDisplay())}>
+                                onPress={() => this.changeMenu()}>
                                 <Icon name='search' />
                             </Button>
                         </Right>
@@ -565,6 +591,9 @@ export default class HomeScreen extends React.Component {
                             </View>
                         ) : null}
                         <H1>Balades</H1>
+                        {(this.state.loading) ? (
+                            <ActivityIndicator size="large" />
+                        ) : null}
                         <FlatList
                             data={this.state.wlkToDisplay}
                             renderItem={({ item }) => {

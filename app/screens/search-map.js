@@ -7,11 +7,13 @@ import NetInfo from "@react-native-community/netinfo";
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
 
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE, enableLatestRenderer } from 'react-native-maps';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import KeepAwake from 'react-native-keep-awake';
 import distanceBtwPoints from 'distance-between-points';
+
+enableLatestRenderer();
 
 class SearchMapScreen extends React.Component {
 

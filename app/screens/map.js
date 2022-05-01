@@ -7,7 +7,7 @@ import { observer } from "mobx-react";
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
 
-import MapView, { Polyline, Marker, PROVIDER_GOOGLE, LocalTile } from 'react-native-maps';
+import MapView, { Polyline, Marker, PROVIDER_GOOGLE, LocalTile, enableLatestRenderer } from 'react-native-maps';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import KeepAwake from 'react-native-keep-awake';
@@ -24,6 +24,7 @@ let currentNotification = false;
 
 import fs from 'react-native-fs';
 const rootDirectory = fs.ExternalDirectoryPath + '/';
+enableLatestRenderer();
 
 class MapScreen extends React.Component {
 

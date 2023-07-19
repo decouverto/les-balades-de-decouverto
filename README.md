@@ -198,8 +198,12 @@ export JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.212.b04-0.fc29.x86_64/jr
 
 ### Change to android API 31
 
+Use Java 17 with Gradle 7.5.
 Change `compile` to `implementation`.
+Bug on module for Audio.
 
+
+For problem regarding debugging:
 ```
 export NODE_OPTIONS=--openssl-legacy-provider
 ```

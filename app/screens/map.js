@@ -8,7 +8,7 @@ import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
 
 import MapView, { Polyline, Marker, PROVIDER_GOOGLE, LocalTile, enableLatestRenderer } from 'react-native-maps';
-import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+//import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import KeepAwake from 'react-native-keep-awake';
 
@@ -43,7 +43,7 @@ class MapScreen extends React.Component {
             ok: 'D\'accord',
             cancel: 'Annuler'
         }).then((success) => {
-            BackgroundGeolocation.configure({
+            /*BackgroundGeolocation.configure({
                 desiredAccuracy: 0,
                 stationaryRadius: 5,
                 distanceFilter: 5,
@@ -89,14 +89,14 @@ class MapScreen extends React.Component {
                     currentNotification = false;
                 }
             });
-            BackgroundGeolocation.start();
+            BackgroundGeolocation.start();*/
         }).catch((error) => {
             this.props.navigation.navigate('AboutWalk', this.state);
         });
     }
 
     componentWillUnmount() {
-        BackgroundGeolocation.stop();
+        //BackgroundGeolocation.stop();
     }
 
     centerMap() {

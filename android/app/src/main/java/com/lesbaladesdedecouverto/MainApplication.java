@@ -8,7 +8,6 @@ import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.guichaguri.trackplayer.TrackPlayer;
 import com.showlocationservicesdialogbox.LocationServicesDialogBoxPackage;
 import com.corbt.keepawake.KCKeepAwakePackage;
-import com.marianhello.bgloc.react.BackgroundGeolocationPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.rnziparchive.RNZipArchivePackage;
 import com.dialogprogress.DialogProgressPackage;
@@ -44,7 +43,6 @@ public class MainApplication extends Application implements ReactApplication {
           new ReactNativePushNotificationPackage(),
           new LocationServicesDialogBoxPackage(),
           new KCKeepAwakePackage(),
-          new BackgroundGeolocationPackage(),
           new SplashScreenReactPackage(),
           new RNZipArchivePackage(),
           new DialogProgressPackage(),

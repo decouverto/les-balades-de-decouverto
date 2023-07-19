@@ -138,6 +138,12 @@ npm start -- --reset-cache
 yarn start -- --reset-cache
 ```
 
+
+#### `npm install --legacy-peer-deps`
+
+#### `/usr/libexec/java_home -V | grep jdk  `
+
+
 #### `npm test`
 
 Runs the [jest](https://github.com/facebook/jest) test runner on your tests.
@@ -188,4 +194,16 @@ There are a few steps you may want to take to troubleshoot these kinds of errors
 Don't write `/bin`
 ```
 export JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.212.b04-0.fc29.x86_64/jre"
+```
+
+### Change to android API 31
+
+Change `compile` to `implementation`.
+
+```
+export NODE_OPTIONS=--openssl-legacy-provider
+```
+
+```
+export PATH=$ANDROID_HOME/tools:$PATH
 ```

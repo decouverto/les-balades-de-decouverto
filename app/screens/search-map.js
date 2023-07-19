@@ -8,7 +8,7 @@ import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
 
 import MapView, { Marker, PROVIDER_GOOGLE, enableLatestRenderer } from 'react-native-maps';
-import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+//import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import KeepAwake from 'react-native-keep-awake';
 import distanceBtwPoints from 'distance-between-points';
@@ -80,7 +80,7 @@ class SearchMapScreen extends React.Component {
                     ok: 'D\'accord',
                     cancel: 'Annuler'
                 }).then(() => {
-                    BackgroundGeolocation.configure({
+                    /*BackgroundGeolocation.configure({
                         desiredAccuracy: 0,
                         stationaryRadius: 50,
                         distanceFilter: 50,
@@ -96,9 +96,9 @@ class SearchMapScreen extends React.Component {
                         stopOnStillActivity: false,
                         notificationIconLarge: 'icon_location',
                         notificationIconSmall: 'icon_location'
-                    });
+                    });*/
                     let centredOnce = false;
-                    BackgroundGeolocation.on('location', (data) => {
+                    /*BackgroundGeolocation.on('location', (data) => {
                         if (this.refs.mapElement) {
                             let userLocation = { longitude: data.longitude, latitude: data.latitude };
                             this.setState({ userLocation });
@@ -108,7 +108,7 @@ class SearchMapScreen extends React.Component {
                             }
                         }
                     });
-                    BackgroundGeolocation.start();
+                    BackgroundGeolocation.start();*/
                 });
             }, () => {
                 this.props.navigation.navigate('Home')
@@ -118,7 +118,7 @@ class SearchMapScreen extends React.Component {
 
     componentWillUnmount() {
         this._mounted = false;
-        BackgroundGeolocation.stop();
+        //BackgroundGeolocation.stop();
     }
 
     centerMap() {

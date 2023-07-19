@@ -200,7 +200,7 @@ export JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.212.b04-0.fc29.x86_64/jr
 
 Use Java 17 with Gradle 7.5.
 Change `compile` to `implementation`.
-Bug on module for Audio.
+Bug on module for Audio. ==> Need to upgrade
 
 
 For problem regarding debugging:

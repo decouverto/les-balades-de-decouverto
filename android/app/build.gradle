@@ -157,7 +157,6 @@ dependencies {
     implementation project(':@react-native-community_async-storage')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
-    implementation project(':react-native-track-player')
     implementation project(':react-native-android-location-services-dialog-box')
     implementation project(':react-native-keep-awake')
     implementation(project(':react-native-maps')) {
@@ -174,6 +173,7 @@ dependencies {
     implementation project(':react-native-fs')
     implementation project(':react-native-push-notification')
     implementation project(':react-native-vector-icons')
+    implementation project(':react-native-sound')
     implementation "com.facebook.react:react-native:+" 
 }
 

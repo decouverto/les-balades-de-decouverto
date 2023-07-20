@@ -6,9 +6,12 @@ import AboutMarkerScreen from './app/screens/about-marker.js';
 import ManageStorageScreen from './app/screens/manage-storage.js';
 import MapScreen from './app/screens/map.js';
 import SearchMapScreen from './app/screens/search-map.js';
+import PlayerScreen from 'react-native-sound-playerview';
 import SideBar from './app/components/sidebar/sidebar.js';
 import { DrawerNavigator } from 'react-navigation';
 import { Root } from 'native-base';
+
+
 const AppNavigator = DrawerNavigator(
   {
     Home: { screen: HomeScreen },
@@ -17,7 +20,8 @@ const AppNavigator = DrawerNavigator(
     AboutMarker: { screen: AboutMarkerScreen },
     ManageStorage: { screen: ManageStorageScreen },
     SearchMap: { screen: SearchMapScreen },
-    Map: { screen: MapScreen }
+    Map: { screen: MapScreen },
+    Player: {screen: PlayerScreen}
   },
   {
     contentComponent: props => <SideBar {...props} />

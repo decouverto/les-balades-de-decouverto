@@ -5,7 +5,6 @@ import android.app.Application;
 import com.facebook.react.ReactApplication;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
-import com.guichaguri.trackplayer.TrackPlayer;
 import com.showlocationservicesdialogbox.LocationServicesDialogBoxPackage;
 import com.corbt.keepawake.KCKeepAwakePackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
@@ -18,6 +17,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage; 
 import com.oblador.vectoricons.VectorIconsPackage;
+import com.zmxv.RNSound.RNSoundPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +39,6 @@ public class MainApplication extends Application implements ReactApplication {
           new NetInfoPackage(),
           new AsyncStoragePackage(),
           new VectorIconsPackage(),
-          new TrackPlayer(),
           new ReactNativePushNotificationPackage(),
           new LocationServicesDialogBoxPackage(),
           new KCKeepAwakePackage(),
@@ -47,7 +46,8 @@ public class MainApplication extends Application implements ReactApplication {
           new RNZipArchivePackage(),
           new DialogProgressPackage(),
           new MapsPackage(),
-          new RNFSPackage()
+          new RNFSPackage(),
+          new RNSoundPackage() 
       );
     }
 

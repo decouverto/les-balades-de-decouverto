@@ -12,10 +12,6 @@ import MapView, { Polyline, Marker, PROVIDER_GOOGLE, LocalTile, enableLatestRend
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import KeepAwake from 'react-native-keep-awake';
 
-import TrackPlayer from 'react-native-track-player';
-import PlayerStore from '../stores/player';
-
-
 import distanceBtwPoints from 'distance-between-points';
 import PushNotification from 'react-native-push-notification';
 import getExtremums from 'get-extremums';
@@ -231,16 +227,6 @@ class MapScreen extends React.Component {
                     <Button style={styles.button_map} onPress={this.centerMap}>
                         <Text style={{ color: '#fff' }}>Recentrer</Text>
                     </Button>
-                    {(PlayerStore.playbackState === TrackPlayer.STATE_PLAYING || PlayerStore.playbackState === TrackPlayer.STATE_BUFFERING) ? (
-                        <Button onPress={() => TrackPlayer.pause()} style={styles.button_audio}>
-                            <Icon name='pause' />
-                        </Button>
-                    ) : null}
-                    {(PlayerStore.playbackState === TrackPlayer.STATE_PAUSED) ? (
-                        <Button onPress={() => TrackPlayer.play()} style={styles.button_audio}>
-                            <Icon name='play' />
-                        </Button>
-                    ) : null}
                     <KeepAwake />
                 </Container>
             </StyleProvider>

@@ -42,7 +42,16 @@ class AboutMarker extends Component {
             this.setState({currentPlaying:(current == this.state.sound)});
         }).catch(() => {
             this.setState({currentPlaying:true});
-        })
+        });
+        TrackPlayer.setupPlayer().then(function () {
+            TrackPlayer.updateOptions({
+                stopWithApp: true,
+                capabilities: [
+                    TrackPlayer.CAPABILITY_PLAY,
+                    TrackPlayer.CAPABILITY_PAUSE
+                ]
+            });
+        });
     }
 
 

@@ -3,9 +3,9 @@
   "version": "1.0.17",
   "private": true,
   "devDependencies": {
-    "@babel/core": "^7.4.5",
+    "@babel/core": "^7.22.9",
     "@babel/plugin-proposal-decorators": "^7.0.0",
-    "@babel/runtime": "^7.4.5",
+    "@babel/runtime": "^7.22.6",
     "babel-eslint": "^8.0.3",
     "babel-jest": "^24.8.0",
     "babel-plugin-module-resolver": "^3.1.1",
@@ -20,7 +20,7 @@
     "graceful-fs": "4.2.4"
   },
   "scripts": {
-    "start": "react-native start",
+    "start": "export NODE_OPTIONS=--openssl-legacy-provider && react-native start",
     "android": "export NODE_OPTIONS=--openssl-legacy-provider && react-native run-android",
     "android-final": "react-native run-android --variant=release",
     "ios": "react-native run-ios",
@@ -37,6 +37,7 @@
   "dependencies": {
     "@mauron85/react-native-background-geolocation": "0.5.3",
     "@react-native-community/async-storage": "1.5.0",
+    "@react-native-community/geolocation": "^3.0.6",
     "@react-native-community/netinfo": "^8.3.0",
     "async": "^2.6.1",
     "distance-between-points": "0.0.0",
@@ -59,6 +60,7 @@
     "react-native-sound-playerview": "^1.0.0",
     "react-native-splash-screen": "3.2.0",
     "react-native-zip-archive": "4.0.0",
-    "react-navigation": "^1.5.12"
+    "react-navigation": "^1.5.12",
+    "typescript": "^5.1.6"
   }
 }

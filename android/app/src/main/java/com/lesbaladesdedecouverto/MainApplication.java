@@ -18,6 +18,7 @@ import com.facebook.soloader.SoLoader;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage; 
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.zmxv.RNSound.RNSoundPackage;
+import com.reactnativecommunity.geolocation.GeolocationPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +48,8 @@ public class MainApplication extends Application implements ReactApplication {
           new DialogProgressPackage(),
           new MapsPackage(),
           new RNFSPackage(),
-          new RNSoundPackage() 
+          new RNSoundPackage(),
+          new GeolocationPackage()
       );
     }
 

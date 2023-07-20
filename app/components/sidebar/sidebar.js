@@ -1,4 +1,5 @@
 import React from 'react';
+import Geolocation from '@react-native-community/geolocation';
 import { Image, Alert, Share, Linking } from 'react-native';
 import { Container, Content, Text, List, ListItem, View, Icon } from 'native-base';
 const routes = [{
@@ -63,7 +64,7 @@ export default class SideBar extends React.Component {
                     <ListItem
                         button
                         onPress={() => {
-                            navigator.geolocation.getCurrentPosition((location) => {
+                            Geolocation.getCurrentPosition((location) => {
                                 var date = new Date();
                                 date.setTime(location.timestamp);
                                 Share.share(

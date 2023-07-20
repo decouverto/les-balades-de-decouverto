@@ -212,3 +212,5 @@ export NODE_OPTIONS=--openssl-legacy-provider
 ```
 adb reverse tcp:8081 tcp:8081
 ```
+
+Need to fix getExtremums

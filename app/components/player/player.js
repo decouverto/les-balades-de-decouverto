@@ -1,6 +1,12 @@
 import React from 'react'
 import { View, Image, Text, Slider, TouchableOpacity, Platform, Alert} from 'react-native';
 
+import { Container, Header, Title, Left, Icon, Right, Button, Body, Content,  StyleProvider } from 'native-base';
+
+import getTheme from '../../../native-base-theme/components';
+import material from '../../../native-base-theme/variables/material';
+
+import KeepAwake from 'react-native-keep-awake';
 import Sound from 'react-native-sound';
 
 const img_speaker = require('./ui_speaker.png');
@@ -15,13 +21,12 @@ export default class PlayerScreen extends React.Component{
         title:props.navigation.state.params.title,
     })
 
-    constructor(){
-        super();
-        this.state = {
-            playState:'paused', //playing, paused
-            playSeconds:0,
-            duration:0
-        }
+    constructor(props){
+        super(props);
+        this.state = this.props.navigation.state.params;
+        this.state.playState = 'paused';
+        this.state.playSeconds = 0;
+        this.state.duration = 0;
         this.sliderEditing = false;
     }
 
@@ -131,41 +136,61 @@ export default class PlayerScreen extends React.Component{
         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
         const durationString = this.getAudioTimeString(this.state.duration);
 
-        return (
-            <View style={{flex:1, justifyContent:'center', backgroundColor:'black'}}>
-                <Image source={img_speaker} style={{width:150, height:150, marginBottom:15, alignSelf:'center'}}/>
-                <View style={{flexDirection:'row', justifyContent:'center', marginVertical:15}}>
-                    <TouchableOpacity onPress={this.jumpPrev15Seconds} style={{justifyContent:'center'}}>
-                        <Image source={img_playjumpleft} style={{width:30, height:30}}/>
-                        <Text style={{position:'absolute', alignSelf:'center', marginTop:1, color:'white', fontSize:12}}>15</Text>
-                    </TouchableOpacity>
-                    {this.state.playState == 'playing' && 
-                    <TouchableOpacity onPress={this.pause} style={{marginHorizontal:20}}>
-                        <Image source={img_pause} style={{width:30, height:30}}/>
-                    </TouchableOpacity>}
-                    {this.state.playState == 'paused' && 
-                    <TouchableOpacity onPress={this.play} style={{marginHorizontal:20}}>
-                        <Image source={img_play} style={{width:30, height:30}}/>
-                    </TouchableOpacity>}
-                    <TouchableOpacity onPress={this.jumpNext15Seconds} style={{justifyContent:'center'}}>
-                        <Image source={img_playjumpright} style={{width:30, height:30}}/>
-                        <Text style={{position:'absolute', alignSelf:'center', marginTop:1, color:'white', fontSize:12}}>15</Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={{marginVertical:15, marginHorizontal:15, flexDirection:'row'}}>
-                    <Text style={{color:'white', alignSelf:'center'}}>{currentTimeString}</Text>
-                    <Slider
-                        onTouchStart={this.onSliderEditStart}
-                        // onTouchMove={() => console.log('onTouchMove')}
-                        onTouchEnd={this.onSliderEditEnd}
-                        // onTouchEndCapture={() => console.log('onTouchEndCapture')}
-                        // onTouchCancel={() => console.log('onTouchCancel')}
-                        onValueChange={this.onSliderEditing}
-                        value={this.state.playSeconds} maximumValue={this.state.duration} maximumTrackTintColor='gray' minimumTrackTintColor='white' thumbTintColor='white' 
-                        style={{flex:1, alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
-                    <Text style={{color:'white', alignSelf:'center'}}>{durationString}</Text>
-                </View>
-            </View>
+        return (<StyleProvider style={getTheme(material)} >
+                <Container>
+                    <Header>
+                        <Left>
+                            <Button
+                                transparent
+                                onPress={() => this.props.navigation.goBack()}>
+                                <Icon name='md-arrow-back' />
+                            </Button>
+                        </Left>
+                        <Body>
+                            <Title>{this.state.title}</Title>
+                        </Body>
+                        <Right />
+                    </Header>
+                    <KeepAwake />
+                    <Content>
+                        <View style={{flex:1, justifyContent:'center', backgroundColor:'black'}}>
+                            <Image source={img_speaker} style={{width:150, height:150, marginBottom:15, alignSelf:'center'}}/>
+                            <View style={{flexDirection:'row', justifyContent:'center', marginVertical:15}}>
+                                <TouchableOpacity onPress={this.jumpPrev15Seconds} style={{justifyContent:'center'}}>
+                                    <Image source={img_playjumpleft} style={{width:30, height:30}}/>
+                                    <Text style={{position:'absolute', alignSelf:'center', marginTop:1, color:'white', fontSize:12}}>15</Text>
+                                </TouchableOpacity>
+                                {this.state.playState == 'playing' && 
+                                <TouchableOpacity onPress={this.pause} style={{marginHorizontal:20}}>
+                                    <Image source={img_pause} style={{width:30, height:30}}/>
+                                </TouchableOpacity>}
+                                {this.state.playState == 'paused' && 
+                                <TouchableOpacity onPress={this.play} style={{marginHorizontal:20}}>
+                                    <Image source={img_play} style={{width:30, height:30}}/>
+                                </TouchableOpacity>}
+                                <TouchableOpacity onPress={this.jumpNext15Seconds} style={{justifyContent:'center'}}>
+                                    <Image source={img_playjumpright} style={{width:30, height:30}}/>
+                                    <Text style={{position:'absolute', alignSelf:'center', marginTop:1, color:'white', fontSize:12}}>15</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{marginVertical:15, marginHorizontal:15, flexDirection:'row'}}>
+                                <Text style={{color:'white', alignSelf:'center'}}>{currentTimeString}</Text>
+                                <Slider
+                                    onTouchStart={this.onSliderEditStart}
+                                    // onTouchMove={() => console.log('onTouchMove')}
+                                    onTouchEnd={this.onSliderEditEnd}
+                                    // onTouchEndCapture={() => console.log('onTouchEndCapture')}
+                                    // onTouchCancel={() => console.log('onTouchCancel')}
+                                    onValueChange={this.onSliderEditing}
+                                    value={this.state.playSeconds} maximumValue={this.state.duration} maximumTrackTintColor='gray' minimumTrackTintColor='white' thumbTintColor='white' 
+                                    style={{flex:1, alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
+                                <Text style={{color:'white', alignSelf:'center'}}>{durationString}</Text>
+                            </View>
+                        </View>
+                    </Content>
+                </Container>
+            </StyleProvider>
+            
         )
     }
 }

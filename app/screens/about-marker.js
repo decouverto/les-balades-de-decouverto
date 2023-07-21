@@ -38,7 +38,7 @@ class AboutMarker extends Component {
 
 
     togglePlayback() {
-        this.props.navigation.navigate('Player', {title: this.state.title, filepath: 'file://' + rootDirectory + this.state.walk.id + '/sounds/' + this.state.sound, dirpath: Sound.MAIN_BUNDLE });
+        this.props.navigation.navigate('Player', {marker: this.state, title: this.state.title, filepath: 'file://' + rootDirectory + this.state.walk.id + '/sounds/' + this.state.sound, dirpath: Sound.MAIN_BUNDLE });
     }
 
 

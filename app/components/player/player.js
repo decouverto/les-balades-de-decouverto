@@ -142,7 +142,7 @@ export default class PlayerScreen extends React.Component{
                         <Left>
                             <Button
                                 transparent
-                                onPress={() => this.props.navigation.goBack()}>
+                                onPress={() => this.props.navigation.navigate('AboutMarker', this.state.marker)}>
                                 <Icon name='md-arrow-back' />
                             </Button>
                         </Left>

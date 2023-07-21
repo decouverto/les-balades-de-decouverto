@@ -6,7 +6,7 @@ import AboutMarkerScreen from './app/screens/about-marker.js';
 import ManageStorageScreen from './app/screens/manage-storage.js';
 import MapScreen from './app/screens/map.js';
 import SearchMapScreen from './app/screens/search-map.js';
-import PlayerScreen from 'react-native-sound-playerview';
+import PlayerScreen from './app/components/player/player.js';
 import SideBar from './app/components/sidebar/sidebar.js';
 import { DrawerNavigator } from 'react-navigation';
 import { Root } from 'native-base';

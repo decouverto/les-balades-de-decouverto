@@ -152,7 +152,7 @@ export default class PlayerScreen extends React.Component{
                         <Right />
                     </Header>
                     <KeepAwake />
-                    <Content>
+                    <Content style={{backgroundColor:'black'}}>
                         <View style={{flex:1, justifyContent:'center', backgroundColor:'black'}}>
                             <Image source={img_speaker} style={{width:150, height:150, marginBottom:15, alignSelf:'center'}}/>
                             <View style={{flexDirection:'row', justifyContent:'center', marginVertical:15}}>

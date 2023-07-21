@@ -1,11 +1,11 @@
 {
   "name": "les-balades-de-decouverto",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "private": true,
   "devDependencies": {
-    "@babel/core": "^7.4.5",
+    "@babel/core": "^7.22.9",
     "@babel/plugin-proposal-decorators": "^7.0.0",
-    "@babel/runtime": "^7.4.5",
+    "@babel/runtime": "^7.22.6",
     "babel-eslint": "^8.0.3",
     "babel-jest": "^24.8.0",
     "babel-plugin-module-resolver": "^3.1.1",
@@ -13,15 +13,15 @@
     "babel-preset-react-native": "^5.0.2",
     "graceful-fs": "^4.2.4",
     "jest": "^24.8.0",
-    "metro-react-native-babel-preset": "^0.54.1",
+    "metro-react-native-babel-preset": "^0.59.0",
     "react-test-renderer": "16.8.3"
   },
   "resolutions": {
     "graceful-fs": "4.2.4"
   },
   "scripts": {
-    "start": "react-native start",
-    "android": "react-native run-android",
+    "start": "export NODE_OPTIONS=--openssl-legacy-provider && react-native start",
+    "android": "export NODE_OPTIONS=--openssl-legacy-provider && react-native run-android",
     "android-final": "react-native run-android --variant=release",
     "ios": "react-native run-ios",
     "test": "jest",
@@ -36,7 +36,8 @@
   },
   "dependencies": {
     "@mauron85/react-native-background-geolocation": "0.5.3",
-    "@react-native-community/async-storage": "^1.5.0",
+    "@react-native-community/async-storage": "1.5.0",
+    "@react-native-community/geolocation": "^3.0.6",
     "@react-native-community/netinfo": "^8.3.0",
     "async": "^2.6.1",
     "distance-between-points": "0.0.0",
@@ -55,9 +56,11 @@
     "react-native-maps": "^0.31.0",
     "react-native-push-notification": "^3.0.2",
     "react-native-responsive-image": "^2.3.1",
+    "react-native-sound": "^0.11.2",
+    "react-native-sound-playerview": "^1.0.0",
     "react-native-splash-screen": "3.2.0",
-    "react-native-track-player": "1.1.4",
     "react-native-zip-archive": "4.0.0",
-    "react-navigation": "^1.5.12"
+    "react-navigation": "^1.5.12",
+    "typescript": "^5.1.6"
   }
 }

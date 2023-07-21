@@ -7,8 +7,8 @@ import NetInfo from "@react-native-community/netinfo";
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
 
+import Geolocation from '@react-native-community/geolocation';
 import MapView, { Marker, PROVIDER_GOOGLE, enableLatestRenderer } from 'react-native-maps';
-import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import KeepAwake from 'react-native-keep-awake';
 import distanceBtwPoints from 'distance-between-points';
@@ -27,6 +27,7 @@ class SearchMapScreen extends React.Component {
             },
             points: []
         }
+        this.currentWatcher = false;
     }
 
     componentDidMount() {
@@ -80,35 +81,25 @@ class SearchMapScreen extends React.Component {
                     ok: 'D\'accord',
                     cancel: 'Annuler'
                 }).then(() => {
-                    BackgroundGeolocation.configure({
-                        desiredAccuracy: 0,
-                        stationaryRadius: 50,
-                        distanceFilter: 50,
-                        locationTimeout: 30,
-                        notificationTitle: 'Les Balades de Découverto',
-                        notificationText: 'Affichage des balades à proximité...',
-                        startOnBoot: false,
-                        stopOnTerminate: true,
-                        locationProvider: BackgroundGeolocation.provider.ANDROID_ACTIVITY_PROVIDER,
-                        interval: 50000,
-                        fastestInterval: 25000,
-                        activitiesInterval: 50000,
-                        stopOnStillActivity: false,
-                        notificationIconLarge: 'icon_location',
-                        notificationIconSmall: 'icon_location'
-                    });
                     let centredOnce = false;
-                    BackgroundGeolocation.on('location', (data) => {
-                        if (this.refs.mapElement) {
-                            let userLocation = { longitude: data.longitude, latitude: data.latitude };
-                            this.setState({ userLocation });
-                            if (!centredOnce) {
-                                this.centerMap();
-                                centredOnce = true;
+                    Geolocation.setRNConfiguration({locationProvider: 'auto', skipPermissionRequests: false});
+                    Geolocation.requestAuthorization(() => {
+                        this.currentWatcher = Geolocation.watchPosition((data) => {
+                            if (this.refs.mapElement) {
+                                let userLocation = { longitude: data.coords.longitude, latitude: data.coords.latitude };
+                                this.setState({ userLocation });
+                                if (!centredOnce) {
+                                    this.centerMap();
+                                    centredOnce = true;
+                                }
                             }
+                        }, function() {
+                            // on error
+                            this.props.navigation.navigate('Home');
                         }
+                    )
+                    
                     });
-                    BackgroundGeolocation.start();
                 });
             }, () => {
                 this.props.navigation.navigate('Home')
@@ -118,7 +109,9 @@ class SearchMapScreen extends React.Component {
 
     componentWillUnmount() {
         this._mounted = false;
-        BackgroundGeolocation.stop();
+        if (this.currentWatcher) {
+            Geolocation.clearWatch(this.currentWatcher);
+        }
     }
 
     centerMap() {

@@ -8,17 +8,32 @@ import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
 
 import MapView, { Polyline, Marker, PROVIDER_GOOGLE, LocalTile, enableLatestRenderer } from 'react-native-maps';
-import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+import Geolocation from '@react-native-community/geolocation';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import KeepAwake from 'react-native-keep-awake';
 
-import TrackPlayer from 'react-native-track-player';
-import PlayerStore from '../stores/player';
-
-
 import distanceBtwPoints from 'distance-between-points';
 import PushNotification from 'react-native-push-notification';
-import getExtremums from 'get-extremums';
+
+function getExtremums(data, value) {
+    var lowest = Number.POSITIVE_INFINITY;
+    var highest = Number.NEGATIVE_INFINITY;
+    var highestKey = 0;
+    var lowestKey = 0;
+    var tmp;
+    for (var i=data.length-1; i>=0; i--) {
+        tmp = data[i][value];
+        if (tmp < lowest) {
+            lowest = tmp;
+            lowestKey = i;
+        } 
+        if (tmp > highest) {
+            highest = tmp;
+            highestKey = i;
+        } 
+    }
+    return { highest: data[highestKey], lowest: data[lowestKey] };
+}
 
 let currentNotification = false;
 
@@ -35,6 +50,7 @@ class MapScreen extends React.Component {
         this.centerMap = this.centerMap.bind(this);
         this.nextMarker = this.nextMarker.bind(this);
         this.prevMarker = this.prevMarker.bind(this);
+        this.currentWatcher = false;
     }
 
     componentDidMount() {
@@ -43,60 +59,59 @@ class MapScreen extends React.Component {
             ok: 'D\'accord',
             cancel: 'Annuler'
         }).then((success) => {
-            BackgroundGeolocation.configure({
-                desiredAccuracy: 0,
-                stationaryRadius: 5,
-                distanceFilter: 5,
-                locationTimeout: 30,
-                notificationTitle: 'Les Balades de Découverto',
-                notificationText: 'Balade en cours...',
-                startOnBoot: false,
-                stopOnTerminate: false,
-                locationProvider: BackgroundGeolocation.provider.ANDROID_ACTIVITY_PROVIDER,
-                interval: 5000,
-                fastestInterval: 2500,
-                activitiesInterval: 5000,
-                stopOnStillActivity: false,
-                notificationIconLarge: 'icon_location',
-                notificationIconSmall: 'icon_location'
-            });
-            BackgroundGeolocation.on('location', (data) => {
-                if (this.refs.mapElement) {
-                    let userLocation = { longitude: data.longitude, latitude: data.latitude };
-                    this.setState({ userLocation });
+            Geolocation.setRNConfiguration({locationProvider: 'auto', skipPermissionRequests: false});
+            Geolocation.requestAuthorization(() => {
+                    this.currentWatcher = Geolocation.watchPosition((data) => {
+                        if (this.refs.mapElement) {
+                            let userLocation = { longitude: data.coords.longitude, latitude: data.coords.latitude };
+                            this.setState({ userLocation });
+                        }
+                        var list = [];
+                        this.state.points.forEach((point) => {
+                            list.push({
+                                d: distanceBtwPoints(data, point.coords),
+                                title: point.title
+                            });
+                        });
+                        var nearest = getExtremums(list, 'd').lowest;
+                        if (nearest.d <= 70) {
+                            if (currentNotification != nearest.title) {
+                                PushNotification.cancelAllLocalNotifications();
+                                var opts = {
+                                    bigText: 'Nouvel extrait audio à écouter: ' + nearest.title,
+                                    title: 'Nouvel extrait audio',
+                                    message: nearest.title
+                                };
+                                PushNotification.localNotification(opts);
+                                currentNotification = nearest.title;
+                            }
+                        } else {
+                            PushNotification.cancelAllLocalNotifications();
+                            currentNotification = false;
+                        }
+                    }, function (err) {
+                        console.warn(err);
+                    }, {
+                        fastestInterval: 2500,
+                        distanceFilter: 5,
+                        maximumAge: 300000,
+                        distanceFilter: 50,
+                        useSignificantChanges: false
+                    })
+                }, function() {
+                    // on error
+                    this.props.navigation.navigate('AboutWalk', this.state);
                 }
-                var list = [];
-                this.state.points.forEach((point) => {
-                    list.push({
-                        d: distanceBtwPoints(data, point.coords),
-                        title: point.title
-                    });
-                });
-                var nearest = getExtremums(list, 'd').lowest;
-                if (nearest.d <= 70) {
-                    if (currentNotification != nearest.title) {
-                        PushNotification.cancelAllLocalNotifications();
-                        var opts = {
-                            bigText: 'Nouvel extrait audio à écouter: ' + nearest.title,
-                            title: 'Nouvel extrait audio',
-                            message: nearest.title
-                        };
-                        PushNotification.localNotification(opts);
-                        currentNotification = nearest.title;
-                    }
-                } else {
-                    PushNotification.cancelAllLocalNotifications();
-                    currentNotification = false;
-                }
-            });
-            BackgroundGeolocation.start();
+              )
         }).catch((error) => {
             this.props.navigation.navigate('AboutWalk', this.state);
         });
     }
 
     componentWillUnmount() {
-        BackgroundGeolocation.stop();
+        if (this.currentWatcher) {
+            Geolocation.clearWatch(this.currentWatcher);
+        }
     }
 
     centerMap() {
@@ -231,16 +246,6 @@ class MapScreen extends React.Component {
                     <Button style={styles.button_map} onPress={this.centerMap}>
                         <Text style={{ color: '#fff' }}>Recentrer</Text>
                     </Button>
-                    {(PlayerStore.playbackState === TrackPlayer.STATE_PLAYING || PlayerStore.playbackState === TrackPlayer.STATE_BUFFERING) ? (
-                        <Button onPress={() => TrackPlayer.pause()} style={styles.button_audio}>
-                            <Icon name='pause' />
-                        </Button>
-                    ) : null}
-                    {(PlayerStore.playbackState === TrackPlayer.STATE_PAUSED) ? (
-                        <Button onPress={() => TrackPlayer.play()} style={styles.button_audio}>
-                            <Icon name='play' />
-                        </Button>
-                    ) : null}
                     <KeepAwake />
                 </Container>
             </StyleProvider>

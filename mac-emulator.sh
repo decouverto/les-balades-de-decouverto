@@ -5,4 +5,5 @@ export ANDROID_HOME=/Users/cedricjung/Library/Android/sdk
 export PATH=$ANDROID_HOME/platform-tools:$PATH
 export PATH=$ANDROID_HOME/tools:$PATH
 export AVD=$(~/Library/Android/sdk/emulator/emulator -list-avds | head -n 1)
+adb reverse tcp:8081 tcp:8081
 ~/Library/Android/sdk/emulator/emulator -avd $AVD -dns-server 8.8.8.8

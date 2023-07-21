@@ -6,7 +6,6 @@ import { Container, Header, Title, Left, Icon, Right, Body, Content, H1, Text, S
 import getTheme from '../../native-base-theme/components';
 import material from '../../native-base-theme/variables/material';
 
-import TrackPlayer from 'react-native-track-player';
 
 import fs from 'react-native-fs';
 
@@ -22,18 +21,6 @@ export default class AboutWalkScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = this.props.navigation.state.params;
-    }
-
-    componentDidMount () {
-        TrackPlayer.setupPlayer().then(function () {
-            TrackPlayer.updateOptions({
-                stopWithApp: true,
-                capabilities: [
-                    TrackPlayer.CAPABILITY_PLAY,
-                    TrackPlayer.CAPABILITY_PAUSE
-                ]
-            });
-        });
     }
 
     openMap(initialPoint) {

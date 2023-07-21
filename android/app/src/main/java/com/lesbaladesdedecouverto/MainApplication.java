@@ -5,10 +5,8 @@ import android.app.Application;
 import com.facebook.react.ReactApplication;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
-import com.guichaguri.trackplayer.TrackPlayer;
 import com.showlocationservicesdialogbox.LocationServicesDialogBoxPackage;
 import com.corbt.keepawake.KCKeepAwakePackage;
-import com.marianhello.bgloc.react.BackgroundGeolocationPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.rnziparchive.RNZipArchivePackage;
 import com.dialogprogress.DialogProgressPackage;
@@ -19,6 +17,8 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage; 
 import com.oblador.vectoricons.VectorIconsPackage;
+import com.zmxv.RNSound.RNSoundPackage;
+import com.reactnativecommunity.geolocation.GeolocationPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,16 +40,16 @@ public class MainApplication extends Application implements ReactApplication {
           new NetInfoPackage(),
           new AsyncStoragePackage(),
           new VectorIconsPackage(),
-          new TrackPlayer(),
           new ReactNativePushNotificationPackage(),
           new LocationServicesDialogBoxPackage(),
           new KCKeepAwakePackage(),
-          new BackgroundGeolocationPackage(),
           new SplashScreenReactPackage(),
           new RNZipArchivePackage(),
           new DialogProgressPackage(),
           new MapsPackage(),
-          new RNFSPackage()
+          new RNFSPackage(),
+          new RNSoundPackage(),
+          new GeolocationPackage()
       );
     }
 

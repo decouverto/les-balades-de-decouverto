@@ -4,6 +4,8 @@ import { Dimensions } from 'react-native';
 
 import { observer } from 'mobx-react';
 
+import Sound from 'react-native-sound';
+
 import { StyleProvider, Header, Container, Content, Card, CardItem, Text, Title, Body, Button, H1, Grid, Row, Icon, Alert, Left, Right } from 'native-base';
 
 import getTheme from '../../native-base-theme/components';
@@ -11,9 +13,6 @@ import material from '../../native-base-theme/variables/material';
 
 import KeepAwake from 'react-native-keep-awake';
 import ResponsiveImage from 'react-native-responsive-image';
-
-import TrackPlayer from 'react-native-track-player';
-import PlayerStore from '../stores/player';
 
 function makeid() {
     var text = '';
@@ -37,57 +36,9 @@ class AboutMarker extends Component {
     }
 
 
-    componentDidMount() {
-        TrackPlayer.getCurrentTrack().then((current) => {
-            this.setState({currentPlaying:(current == this.state.sound)});
-        }).catch(() => {
-            this.setState({currentPlaying:true});
-        })
-    }
-
 
     togglePlayback() {
-        let s = {
-            id: this.state.sound,
-            url: 'file://' + rootDirectory + this.state.walk.id + '/sounds/' + this.state.sound, 
-            title: this.state.title,
-            album: this.state.walk.title
-        }
-        TrackPlayer.getPosition().then((position)=> {
-            if (position == 0) {
-                TrackPlayer.add([s])
-                TrackPlayer.play();
-                this.setState({currentPlaying: true});
-            } else {
-                TrackPlayer.getCurrentTrack().then((current) => {
-                    if ((PlayerStore.playbackState === TrackPlayer.STATE_PAUSED || PlayerStore.playbackState === TrackPlayer.STATE_STOPPED) && current == this.state.sound) {
-                        TrackPlayer.getDuration().then((duration) => {
-                            if (Number(position).toFixed(1) == Number(duration).toFixed(1)) {
-                                this.changingTrack = true;
-                                TrackPlayer.reset();
-                                TrackPlayer.add([s])
-                                TrackPlayer.play();
-                                this.setState({currentPlaying: true});
-                                this.changingTrack = false;
-                                
-                            } else {
-                                this.setState({currentPlaying: true});
-                                TrackPlayer.play();
-                            }
-                        })                        
-                    } else if (current != this.state.sound) {
-                        this.changingTrack = true;
-                        TrackPlayer.reset();
-                        TrackPlayer.add([s])
-                        TrackPlayer.play();
-                        this.setState({currentPlaying: true});
-                        this.changingTrack = false;
-                    } else {
-                        TrackPlayer.pause();
-                    }
-                });
-            }
-        });
+        this.props.navigation.navigate('Player', {marker: this.state, title: this.state.title, filepath: 'file://' + rootDirectory + this.state.walk.id + '/sounds/' + this.state.sound, dirpath: Sound.MAIN_BUNDLE });
     }
 
 
@@ -127,17 +78,10 @@ class AboutMarker extends Component {
                                     <H1>Explications audio</H1>
                                 </Row>
                                 <Row>
-                                    {((PlayerStore.playbackState === TrackPlayer.STATE_PLAYING || PlayerStore.playbackState === TrackPlayer.STATE_BUFFERING) && this.state.currentPlaying && !this.changingTrack) ? (
-                                        <Button iconRight onPress={this.togglePlayback}>
-                                            <Text>Pause </Text>
-                                            <Icon name='pause' />
-                                        </Button>
-                                    ) : (
-                                            <Button iconRight onPress={this.togglePlayback}>
-                                                <Text>Play </Text>
-                                                <Icon name='play' />
-                                            </Button>
-                                        )}
+                                    <Button iconRight onPress={this.togglePlayback}>
+                                        <Text>Play </Text>
+                                        <Icon name='play' />
+                                    </Button>
                                 </Row>
                             </Grid>
                         </CardItem>

@@ -6,20 +6,22 @@ buildscript {
         google()
         jcenter()
     }
-    dependencies {
-        classpath("com.android.tools.build:gradle:3.5.4") 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
     ext {
         buildToolsVersion = "28.0.3"
-        minSdkVersion = 19
-        compileSdkVersion = 31
-        targetSdkVersion = 31
+        minSdkVersion = 21
+        compileSdkVersion = 33
+        targetSdkVersion = 33
+        kotlin_version = '1.6.10' 
         supportLibVersion = "29.0.0"
         googlePlayServicesVersion = "18.0.0"
         playServicesVersion = "18.0.0"
         gradle3EXPERIMENTAL = "yes"
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:7.0.0") 
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
     }
 }
 
@@ -28,7 +30,7 @@ subprojects {
     afterEvaluate {project ->
         if (project.hasProperty("android")) {
             android {
-                compileSdkVersion 29
+                compileSdkVersion 33
                 buildToolsVersion "28.0.3"
             }
         }
@@ -38,6 +40,16 @@ subprojects {
 
 allprojects {
     repositories {
+        exclusiveContent {
+           filter {
+               includeGroup "com.facebook.react"
+           }
+           forRepository {
+               maven {
+                   url "$rootDir/../node_modules/react-native/android"
+               }
+           }
+        }
         mavenLocal()
         google()
         jcenter()
@@ -46,5 +58,7 @@ allprojects {
             url "$rootDir/../node_modules/react-native/android"
         }
         maven { url 'https://maven.google.com' }
+        maven { url 'https://www.jitpack.io' }
     }
 }
+

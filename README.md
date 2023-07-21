@@ -138,6 +138,12 @@ npm start -- --reset-cache
 yarn start -- --reset-cache
 ```
 
+
+#### `npm install --legacy-peer-deps`
+
+#### `/usr/libexec/java_home -V | grep jdk  `
+
+
 #### `npm test`
 
 Runs the [jest](https://github.com/facebook/jest) test runner on your tests.
@@ -189,3 +195,22 @@ Don't write `/bin`
 ```
 export JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.212.b04-0.fc29.x86_64/jre"
 ```
+
+### Change to android API 31
+
+Use Java **17** with Gradle 7.5.
+Change `compile` to `implementation`.
+
+Bug on module for Audio. ==> Need to upgrade
+https://github.com/doublesymmetry/react-native-track-player/issues/1865
+
+For problem regarding debugging:
+```
+export NODE_OPTIONS=--openssl-legacy-provider
+```
+
+```
+adb reverse tcp:8081 tcp:8081
+```
+
+Need to fix getExtremums

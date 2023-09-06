@@ -28,7 +28,10 @@ function makeid(length) {
     }
     return result.join('');
 }
-
+function escapeRegex(string) {
+    return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+  
 export default class HomeScreen extends React.Component {
 
     constructor(props) {
@@ -402,6 +405,7 @@ export default class HomeScreen extends React.Component {
             }
         }
         var arr = [];
+        let reg = new RegExp(escapeRegex(this.state.search), 'i');
         this.state.walks.forEach((data) => {
             let err = false;
             if (this.state.selectedSector != 'all' && this.state.selectedSector != data.zone) {
@@ -414,7 +418,7 @@ export default class HomeScreen extends React.Component {
                 err = true;
             }
             if (this.state.search != '') {
-                if (data.zone.search(new RegExp(this.state.search, 'i')) == -1 && data.theme.search(new RegExp(this.state.search, 'i')) == -1 && data.description.search(new RegExp(this.state.search, 'i')) == -1 && data.title.search(new RegExp(this.state.search, 'i')) == -1) {
+                if (data.zone.search(reg) == -1 && data.theme.search(reg) == -1 && data.description.search(reg) == -1 && data.title.search(reg) == -1) {
                     err = true;
                 }
             }
